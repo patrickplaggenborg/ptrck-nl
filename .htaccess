@@ -1,3 +1,23 @@
+# BEGIN SECURITY HEADERS
+<IfModule mod_headers.c>
+    # Prevent clickjacking attacks
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Enable XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Control referrer information
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Remove server signature
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+</IfModule>
+# END SECURITY HEADERS
+
 # BEGIN REMOVE SLUG CUSTOM POST TYPE RULES
 RewriteRule ^portfolio/(.+)/$ /$1 [R=301,L]
 # END REMOVE SLUG CUSTOM POST TYPE RULES
