@@ -3,6 +3,11 @@
 // loads wordpress
 require_once('get_wp.php'); // loads wordpress stuff
 
+// Security check: Only allow users with edit permissions
+if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
+	wp_die( 'You do not have permission to access this page.' );
+}
+
 // gets shortcode
 $shortcode = base64_decode( trim( $_GET['sc'] ) );
 
