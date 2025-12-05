@@ -22,7 +22,7 @@ define('DB_NAME', getenv('WORDPRESS_DB_NAME') ?: 'ptrck_nl');
 define('DB_USER', getenv('WORDPRESS_DB_USER') ?: 'ptrck_nl');
 
 /** MySQL database password */
-define('DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') ?: 'i9RtjT%Qd8L^wa');
+define('DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') ?: '');
 
 /** MySQL hostname */
 define('DB_HOST', getenv('WORDPRESS_DB_HOST') ?: 'localhost');
@@ -44,14 +44,14 @@ define('DB_COLLATE', getenv('WORDPRESS_DB_COLLATE') ?: '');
  */
 
 define('FS_METHOD', getenv('WORDPRESS_FS_METHOD') ?: 'direct');
-define('AUTH_KEY',         getenv('WORDPRESS_AUTH_KEY') ?: 'c1buXeC9cfWAr4TOnd0IadkEukEZOXnHKxk0AWUieNSliIdD96ZCsF43ESTvxPOZ');
-define('SECURE_AUTH_KEY',  getenv('WORDPRESS_SECURE_AUTH_KEY') ?: 'qXA5V4S79HcLGEoCaKyI6vXGXU0MmRx5UXynZUoxnrCEi9b6YUyYcCVZXSCPK9g9');
-define('LOGGED_IN_KEY',    getenv('WORDPRESS_LOGGED_IN_KEY') ?: 'ypcXzYVLO91ngbksyVKNajp61OECAkcg2up5W3ZRxp7AC4btnEW5rEHNe44WNzaV');
-define('NONCE_KEY',        getenv('WORDPRESS_NONCE_KEY') ?: 'KDIrLcbWkWYvYg54iYhjbgkjf12Fc5KPXvDlQ2tytY531AfcfaPnw4yd1Kp3KOUV');
-define('AUTH_SALT',        getenv('WORDPRESS_AUTH_SALT') ?: 'cT6rjxKMj0ERTy2vUCKshONdWCjWjDrwDmR4WXl5wG87UJqV7jORt1WGXW8JKCEN');
-define('SECURE_AUTH_SALT', getenv('WORDPRESS_SECURE_AUTH_SALT') ?: 'IdSGugElVRvB4nC6fGRJuvOp8ho43J5wIvBKfXc67FWFYMyzcyQzam07umlUT332');
-define('LOGGED_IN_SALT',   getenv('WORDPRESS_LOGGED_IN_SALT') ?: 'UXS1E611BXZlui1lRN5cb8PeGGcgCLgAiFXeTaEfswsBq9ZOWwuy1A7xFAnJ3Q31');
-define('NONCE_SALT',       getenv('WORDPRESS_NONCE_SALT') ?: 'w7iTdvW6wtv2PXqfrMfdVJB19LOVCsrO8KhjWhU3AAf2VzWAmXMuQ7WU6kFZmTje');
+define('AUTH_KEY',         getenv('WORDPRESS_AUTH_KEY') ?: '');
+define('SECURE_AUTH_KEY',  getenv('WORDPRESS_SECURE_AUTH_KEY') ?: '');
+define('LOGGED_IN_KEY',    getenv('WORDPRESS_LOGGED_IN_KEY') ?: '');
+define('NONCE_KEY',        getenv('WORDPRESS_NONCE_KEY') ?: '');
+define('AUTH_SALT',        getenv('WORDPRESS_AUTH_SALT') ?: '');
+define('SECURE_AUTH_SALT', getenv('WORDPRESS_SECURE_AUTH_SALT') ?: '');
+define('LOGGED_IN_SALT',   getenv('WORDPRESS_LOGGED_IN_SALT') ?: '');
+define('NONCE_SALT',       getenv('WORDPRESS_NONCE_SALT') ?: '');
 define('WP_TEMP_DIR',      getenv('WORDPRESS_TEMP_DIR') ?: '/var/www/html/wp-content/uploads');
 
 /**#@-*/
