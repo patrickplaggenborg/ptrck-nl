@@ -1,0 +1,56 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+readme.html
+*.md
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Environment files (should be set in Coolify)
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.bak
+*.backup
+*.sql
+APP-DATA.SQL
+APP-META.INI
+
+# Node modules (if any)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Composer (if not needed in production)
+vendor/
+composer.lock
+
+# Docker files (don't copy into image)
+Dockerfile
+.dockerignore
+docker-compose.yml
