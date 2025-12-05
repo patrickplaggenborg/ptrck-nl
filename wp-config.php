@@ -83,6 +83,22 @@ define('WPLANG', getenv('WORDPRESS_LANG') ?: '');
  */
 define('WP_DEBUG', filter_var(getenv('WORDPRESS_DEBUG'), FILTER_VALIDATE_BOOLEAN) ?: false);
 
+/**
+ * WordPress Debug Logging
+ * 
+ * WP_DEBUG_LOG - Log errors to wp-content/debug.log (default: true for logging)
+ * WP_DEBUG_DISPLAY - Display errors on screen (default: false for production)
+ * SAVEQUERIES - Save database queries for analysis (default: false)
+ */
+define('WP_DEBUG_LOG', filter_var(getenv('WORDPRESS_DEBUG_LOG'), FILTER_VALIDATE_BOOLEAN) ?: true);
+define('WP_DEBUG_DISPLAY', filter_var(getenv('WORDPRESS_DEBUG_DISPLAY'), FILTER_VALIDATE_BOOLEAN) ?: false);
+@ini_set('display_errors', WP_DEBUG_DISPLAY ? 1 : 0);
+
+/**
+ * Save database queries for analysis (optional, can impact performance)
+ */
+define('SAVEQUERIES', filter_var(getenv('WORDPRESS_SAVEQUERIES'), FILTER_VALIDATE_BOOLEAN) ?: false);
+
 /* That's all, stop editing! Happy blogging. */
 
 /** Absolute path to the WordPress directory. */
