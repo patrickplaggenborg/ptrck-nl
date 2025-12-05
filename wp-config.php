@@ -16,22 +16,22 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'ptrck_nl');
+define('DB_NAME', getenv('WORDPRESS_DB_NAME') ?: 'ptrck_nl');
 
 /** MySQL database username */
-define('DB_USER', 'ptrck_nl');
+define('DB_USER', getenv('WORDPRESS_DB_USER') ?: 'ptrck_nl');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'i9RtjT%Qd8L^wa');
+define('DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') ?: 'i9RtjT%Qd8L^wa');
 
 /** MySQL hostname */
-define('DB_HOST', 'localhost');
+define('DB_HOST', getenv('WORDPRESS_DB_HOST') ?: 'localhost');
 
 /** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8');
+define('DB_CHARSET', getenv('WORDPRESS_DB_CHARSET') ?: 'utf8');
 
 /** The Database Collate type. Don't change this if in doubt. */
-define('DB_COLLATE', '');
+define('DB_COLLATE', getenv('WORDPRESS_DB_COLLATE') ?: '');
 
 /**#@+
  * Authentication Unique Keys and Salts.
@@ -43,16 +43,16 @@ define('DB_COLLATE', '');
  * @since 2.6.0
  */
 
-define('FS_METHOD','direct');
-define('AUTH_KEY',         'c1buXeC9cfWAr4TOnd0IadkEukEZOXnHKxk0AWUieNSliIdD96ZCsF43ESTvxPOZ');
-define('SECURE_AUTH_KEY',  'qXA5V4S79HcLGEoCaKyI6vXGXU0MmRx5UXynZUoxnrCEi9b6YUyYcCVZXSCPK9g9');
-define('LOGGED_IN_KEY',    'ypcXzYVLO91ngbksyVKNajp61OECAkcg2up5W3ZRxp7AC4btnEW5rEHNe44WNzaV');
-define('NONCE_KEY',        'KDIrLcbWkWYvYg54iYhjbgkjf12Fc5KPXvDlQ2tytY531AfcfaPnw4yd1Kp3KOUV');
-define('AUTH_SALT',        'cT6rjxKMj0ERTy2vUCKshONdWCjWjDrwDmR4WXl5wG87UJqV7jORt1WGXW8JKCEN');
-define('SECURE_AUTH_SALT', 'IdSGugElVRvB4nC6fGRJuvOp8ho43J5wIvBKfXc67FWFYMyzcyQzam07umlUT332');
-define('LOGGED_IN_SALT',   'UXS1E611BXZlui1lRN5cb8PeGGcgCLgAiFXeTaEfswsBq9ZOWwuy1A7xFAnJ3Q31');
-define('NONCE_SALT',       'w7iTdvW6wtv2PXqfrMfdVJB19LOVCsrO8KhjWhU3AAf2VzWAmXMuQ7WU6kFZmTje');
-define('WP_TEMP_DIR',      '/home/ptrck/domains/ptrck.nl/public_html/wp-content/uploads');
+define('FS_METHOD', getenv('WORDPRESS_FS_METHOD') ?: 'direct');
+define('AUTH_KEY',         getenv('WORDPRESS_AUTH_KEY') ?: 'c1buXeC9cfWAr4TOnd0IadkEukEZOXnHKxk0AWUieNSliIdD96ZCsF43ESTvxPOZ');
+define('SECURE_AUTH_KEY',  getenv('WORDPRESS_SECURE_AUTH_KEY') ?: 'qXA5V4S79HcLGEoCaKyI6vXGXU0MmRx5UXynZUoxnrCEi9b6YUyYcCVZXSCPK9g9');
+define('LOGGED_IN_KEY',    getenv('WORDPRESS_LOGGED_IN_KEY') ?: 'ypcXzYVLO91ngbksyVKNajp61OECAkcg2up5W3ZRxp7AC4btnEW5rEHNe44WNzaV');
+define('NONCE_KEY',        getenv('WORDPRESS_NONCE_KEY') ?: 'KDIrLcbWkWYvYg54iYhjbgkjf12Fc5KPXvDlQ2tytY531AfcfaPnw4yd1Kp3KOUV');
+define('AUTH_SALT',        getenv('WORDPRESS_AUTH_SALT') ?: 'cT6rjxKMj0ERTy2vUCKshONdWCjWjDrwDmR4WXl5wG87UJqV7jORt1WGXW8JKCEN');
+define('SECURE_AUTH_SALT', getenv('WORDPRESS_SECURE_AUTH_SALT') ?: 'IdSGugElVRvB4nC6fGRJuvOp8ho43J5wIvBKfXc67FWFYMyzcyQzam07umlUT332');
+define('LOGGED_IN_SALT',   getenv('WORDPRESS_LOGGED_IN_SALT') ?: 'UXS1E611BXZlui1lRN5cb8PeGGcgCLgAiFXeTaEfswsBq9ZOWwuy1A7xFAnJ3Q31');
+define('NONCE_SALT',       getenv('WORDPRESS_NONCE_SALT') ?: 'w7iTdvW6wtv2PXqfrMfdVJB19LOVCsrO8KhjWhU3AAf2VzWAmXMuQ7WU6kFZmTje');
+define('WP_TEMP_DIR',      getenv('WORDPRESS_TEMP_DIR') ?: '/var/www/html/wp-content/uploads');
 
 /**#@-*/
 
@@ -62,7 +62,7 @@ define('WP_TEMP_DIR',      '/home/ptrck/domains/ptrck.nl/public_html/wp-content/
  * You can have multiple installations in one database if you give each a unique
  * prefix. Only numbers, letters, and underscores please!
  */
-$table_prefix  = 'wp2_';
+$table_prefix  = getenv('WORDPRESS_TABLE_PREFIX') ?: 'wp2_';
 
 /**
  * WordPress Localized Language, defaults to English.
@@ -72,7 +72,7 @@ $table_prefix  = 'wp2_';
  * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
  * language support.
  */
-define('WPLANG', '');
+define('WPLANG', getenv('WORDPRESS_LANG') ?: '');
 
 /**
  * For developers: WordPress debugging mode.
@@ -81,7 +81,7 @@ define('WPLANG', '');
  * It is strongly recommended that plugin and theme developers use WP_DEBUG
  * in their development environments.
  */
-define('WP_DEBUG', false);
+define('WP_DEBUG', filter_var(getenv('WORDPRESS_DEBUG'), FILTER_VALIDATE_BOOLEAN) ?: false);
 
 /* That's all, stop editing! Happy blogging. */
 
