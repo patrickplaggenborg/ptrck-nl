@@ -14,18 +14,27 @@
  * @package WordPress
  */
 
+// Helper function to get env var or die if missing (for required vars)
+function get_env_required($key) {
+    $val = getenv($key);
+    if ($val === false || $val === '') {
+        die("Error: Environment variable '$key' is required but missing.");
+    }
+    return $val;
+}
+
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', getenv('WORDPRESS_DB_NAME') ?: 'ptrck_nl');
+define('DB_NAME', get_env_required('WORDPRESS_DB_NAME'));
 
 /** MySQL database username */
-define('DB_USER', getenv('WORDPRESS_DB_USER') ?: 'ptrck_nl');
+define('DB_USER', get_env_required('WORDPRESS_DB_USER'));
 
 /** MySQL database password */
-define('DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') ?: '');
+define('DB_PASSWORD', get_env_required('WORDPRESS_DB_PASSWORD'));
 
 /** MySQL hostname */
-define('DB_HOST', getenv('WORDPRESS_DB_HOST') ?: 'localhost');
+define('DB_HOST', get_env_required('WORDPRESS_DB_HOST'));
 
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', getenv('WORDPRESS_DB_CHARSET') ?: 'utf8');
@@ -44,14 +53,14 @@ define('DB_COLLATE', getenv('WORDPRESS_DB_COLLATE') ?: '');
  */
 
 define('FS_METHOD', getenv('WORDPRESS_FS_METHOD') ?: 'direct');
-define('AUTH_KEY',         getenv('WORDPRESS_AUTH_KEY') ?: '');
-define('SECURE_AUTH_KEY',  getenv('WORDPRESS_SECURE_AUTH_KEY') ?: '');
-define('LOGGED_IN_KEY',    getenv('WORDPRESS_LOGGED_IN_KEY') ?: '');
-define('NONCE_KEY',        getenv('WORDPRESS_NONCE_KEY') ?: '');
-define('AUTH_SALT',        getenv('WORDPRESS_AUTH_SALT') ?: '');
-define('SECURE_AUTH_SALT', getenv('WORDPRESS_SECURE_AUTH_SALT') ?: '');
-define('LOGGED_IN_SALT',   getenv('WORDPRESS_LOGGED_IN_SALT') ?: '');
-define('NONCE_SALT',       getenv('WORDPRESS_NONCE_SALT') ?: '');
+define('AUTH_KEY',         get_env_required('WORDPRESS_AUTH_KEY'));
+define('SECURE_AUTH_KEY',  get_env_required('WORDPRESS_SECURE_AUTH_KEY'));
+define('LOGGED_IN_KEY',    get_env_required('WORDPRESS_LOGGED_IN_KEY'));
+define('NONCE_KEY',        get_env_required('WORDPRESS_NONCE_KEY'));
+define('AUTH_SALT',        get_env_required('WORDPRESS_AUTH_SALT'));
+define('SECURE_AUTH_SALT', get_env_required('WORDPRESS_SECURE_AUTH_SALT'));
+define('LOGGED_IN_SALT',   get_env_required('WORDPRESS_LOGGED_IN_SALT'));
+define('NONCE_SALT',       get_env_required('WORDPRESS_NONCE_SALT'));
 define('WP_TEMP_DIR',      getenv('WORDPRESS_TEMP_DIR') ?: '/var/www/html/wp-content/uploads');
 
 /**#@-*/
