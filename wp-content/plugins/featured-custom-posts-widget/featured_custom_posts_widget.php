@@ -11,8 +11,8 @@ Author URI: http://linkhousemedia.com
 // Featured Custom Posts Widget
 class featuredCustomPosts extends WP_Widget {
 	
-	function featuredCustomPosts() {
-		parent::WP_Widget(false, 'Featured Custom Posts');
+	function __construct() {
+		parent::__construct('featuredCustomPosts', 'Featured Custom Posts');
 	}
 	
 	function form($instance) {
