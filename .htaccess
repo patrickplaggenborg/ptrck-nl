@@ -18,6 +18,23 @@
 </IfModule>
 # END SECURITY HEADERS
 
+# BEGIN HARDENING
+# Disable directory browsing
+Options -Indexes
+
+# Block access to sensitive files
+<FilesMatch "^(\.git|\.env|composer\.json|composer\.lock|package\.json|readme\.html|license\.txt|wp-config-sample\.php)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect wp-config.php
+<Files wp-config.php>
+    Order allow,deny
+    Deny from all
+</Files>
+# END HARDENING
+
 # BEGIN REMOVE SLUG CUSTOM POST TYPE RULES
 RewriteRule ^portfolio/(.+)/$ /$1 [R=301,L]
 # END REMOVE SLUG CUSTOM POST TYPE RULES

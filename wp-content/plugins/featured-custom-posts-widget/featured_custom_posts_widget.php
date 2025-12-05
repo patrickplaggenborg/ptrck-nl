@@ -73,7 +73,7 @@ class featuredCustomPosts extends WP_Widget {
 			$featured_image = ( function_exists('wp_get_attachment_image') && $post_thumbnail_id ) ? wp_get_attachment_image( $post_thumbnail_id, array(120,120) ) : $post->post_title;
 			$text = $featured_image == '' ? $post->title : $featured_image;
 			
-			printf ( '	<li><a href="%s">%s</a></li>', $url, $text );				
+			printf ( '	<li><a href="%s">%s</a></li>', esc_url( $url ), $text );				
 		
 		endwhile;
 
