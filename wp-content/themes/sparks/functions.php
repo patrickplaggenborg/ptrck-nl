@@ -241,7 +241,7 @@ function zilla_enqueue_scripts() {
     /* Load our stylesheets -----------------------------------------------------*/
     $zilla_options = get_option('zilla_framework_options');
     wp_enqueue_style( $zilla_options['theme_name'], get_stylesheet_uri() );
-    wp_enqueue_style( 'PTSerifFont', 'http://fonts.googleapis.com/css?family=PT+Serif:400,400italic' );
+    wp_enqueue_style( 'PTSerifFont', 'https://fonts.googleapis.com/css?family=PT+Serif:400,400italic' );
 }
 endif;
 add_action('wp_enqueue_scripts', 'zilla_enqueue_scripts');

@@ -75,6 +75,23 @@ $table_prefix  = getenv('WORDPRESS_TABLE_PREFIX') ?: 'wp2_';
 define('WPLANG', getenv('WORDPRESS_LANG') ?: '');
 
 /**
+ * WordPress URL Configuration
+ * Force HTTPS for all URLs
+ */
+if (!defined('WP_HOME')) {
+	define('WP_HOME', getenv('WORDPRESS_HOME') ?: 'https://ptrck.nl');
+}
+if (!defined('WP_SITEURL')) {
+	define('WP_SITEURL', getenv('WORDPRESS_SITEURL') ?: 'https://ptrck.nl');
+}
+// Force SSL for admin
+define('FORCE_SSL_ADMIN', true);
+// Detect if we're behind a proxy/load balancer
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+	$_SERVER['HTTPS'] = 'on';
+}
+
+/**
  * For developers: WordPress debugging mode.
  *
  * Change this to true to enable the display of notices during development.
