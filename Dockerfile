@@ -20,3 +20,4 @@ EXPOSE 80
 
 # Use the default WordPress entrypoint
 # The wordpress:latest image already has the proper entrypoint configured
+
