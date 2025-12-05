@@ -1,0 +1,327 @@
+/*-----------------------------------------------------------------------------------
+
+	Artiste Light
+
+	License: GNU General Public License version 3.0
+	License URI: http://www.gnu.org/licenses/gpl-3.0.html
+	Version: 1.0
+	
+	Designed & Handcrafted by Orman Clark for PremiumPixels.com
+	All files, unless otherwise stated, are released under the GNU General Public License
+	version 3.0 (http://www.gnu.org/licenses/gpl-3.0.html)
+
+-----------------------------------------------------------------------------------
+
+	1.	Document Setup (body, common classes, vertical rhythm, structure etc)
+	2.	Header Styles
+	3.	Navigation & Menus
+	4.	Main Content Styles
+	5.  Portfolio Content Styles
+	6.	Post Content Styles
+	7.	Comments
+	8.	Pagination
+	9.	Footer Styles
+	10.	Page & Page Templates
+	11.	Widgets
+	12.	Shortcode Styles
+
+-----------------------------------------------------------------------------------*/
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	1.	Document Setup (body, common classes, vertical rhythm, structure etc)
+/*-----------------------------------------------------------------------------------*/
+
+body { 
+    background: #fff url(../images/bg.png) 0 0 repeat-y fixed;
+    color: #515255;
+}
+
+
+a { 
+    border-bottom: 1px solid #cdd0d2;
+    color: #f15755;
+}
+
+a:hover { color: #515255; }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 { color: #2c2d31; }
+
+.entry-title,
+.entry-title a,
+.single-portfolio .entry-related .entry-title a { color: #2c2d31; }
+
+.entry-title a:hover { color: #f15755; }
+
+/* Common Layout --------------------------------*/
+
+#content { text-shadow: 0 1px 0 rgba(255,255,255,1); }
+
+#sidebar {
+	background: #fff;
+	color: #8d8f8f;
+}
+
+#sidebar a,
+#sidebar .tz_tweet_widget span a { 
+    border-bottom: 1px solid #e6eaed;
+    color: #8d8f8f; 
+}
+
+#sidebar a:hover { color: #f15755; }
+
+/*-----------------------------------------------------------------------------------*/
+/*	2.	Header Styles
+/*-----------------------------------------------------------------------------------*/
+
+#logo a { 
+    border-bottom: none;
+    color: #000; 
+}
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	3.	Navigation & Menus
+/*-----------------------------------------------------------------------------------*/
+
+#sidebar .current-menu-item > a,
+.blog #sidebar .current_page_parent a,
+.single-post #sidebar .current_page_parent a,
+#sidebar .current-portfolio-parent a /* This adds highlight to skill types */ { color: #f15755; }
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	4.	Main Content Styles
+/*-----------------------------------------------------------------------------------*/
+
+abbr[title],
+acronym[title],
+dfn[title] { border-bottom: 1px dotted #666; }
+
+var,
+kbd,
+samp,
+code,
+pre { }
+
+table { border: 1px solid #ccc; }
+
+table .even { background: #ddd; }
+
+tr { border-bottom: 1px solid #ccc; }
+
+/* Common Media Elements ----------------------*/
+
+.post-thumb a { background: #fff url(../images/expand_light.png) 50% 50% no-repeat; }
+
+.post-thumb img {
+    border: 5px solid #fff;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+
+.entry-content img { 
+    border: 5px solid #fff;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+
+.gallery-item img { border: 5px solid #fff !important; }
+
+/* Common Form Elements ----------------------------*/
+
+input,
+textarea,
+button {
+	background: #fff;
+	border: 1px solid #bfc2c4;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.1) inset;
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.1) inset;
+	box-shadow: 0 1px 2px rgba(0,0,0,.1) inset;
+	color: #8d8f8f;
+}
+
+button,
+#submit {
+    background: #fff url(../images/button_bg.gif) 0 -30px repeat-x;
+	border: 1px solid #b2b4b6;
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0,.1);
+	-moz-box-shadow: 0 1px 1px rgba(0,0,0,.1);
+	box-shadow: 0 1px 1px rgba(0,0,0,.1);
+	color: #444;
+	text-shadow: 0 1px 0 rgba(255,255,255,.4);
+}
+
+#submit:hover
+button:hover {
+    background: #fff url(../images/button_bg.gif) 0 0 repeat-x;
+    border-color: #b2b4b6;
+    color: #444;
+}
+
+input:focus,
+textarea:focus {
+	background: #fff;
+	border-color: #a5a7a8;
+	color: #43474c;
+}
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	5.	Portfolio Content Styles
+/*-----------------------------------------------------------------------------------*/
+
+.entry-skills a { color: #8d8f8f; }
+
+.entry-skills a:hover { color: #f15755; }
+
+/* Single Portfolio -----------------------------------------------------------------*/
+
+.single-portfolio .entry-title a { color: #8d8f8f; }
+
+.single-portfolio .entry-title a:hover { color: #f15755; }
+
+.slide_count { color: #8d8f8f; }
+
+.slides_prev,
+.slides_next { color: #8d8f8f; }
+
+.slider,
+.image-frame img,
+.video-frame iframe {
+    background: #fff;
+	border: 5px solid #fff;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+
+.image-frame img,
+.video-frame iframe { margin-left: -5px; }
+
+.entry-related { border-top: 1px solid #CDD0D2; }
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	6.	Post Content Styles
+/*-----------------------------------------------------------------------------------*/
+
+.blog .hentry,
+.single-post .hentry,
+.date .hentry,
+.category .hentry,
+.tag .hentry { border-bottom: 1px solid #cdd0d2; }
+
+.entry-meta { color: #8d8f8f; }
+
+.entry-meta a { color: #8d8f8f; }
+
+.entry-meta a:hover { color: #515255; }
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	7.	Comments
+/*-----------------------------------------------------------------------------------*/
+
+.commentlist #respond { background-color: #fff; }
+
+.comment > div {
+	background: #fff;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+	box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+
+.comment-author-admin {
+	background: #fbfbfb!important;
+	border: #efefef;
+}
+
+.comment-author a { color: #2c2d31; }
+
+.comment-author a:hover { color: #f15755; }
+
+.bypostauthor .comment-author,
+.bypostauthor .comment-author a { color: #f15755; }
+
+.bypostauthor .comment-author a:hover { color: #2c2d31; }
+
+.comment-meta { color: #8d8f8f; }
+
+.comment-meta a { color: #8d8f8f; }
+
+.comment-meta a:hover { color: #515255; }
+
+.cancel-comment-reply a { color: #8d8f8f; }
+
+.cancel-comment-reply a:hover { color: #515255; }
+
+.moderation { color: #f15755; }
+
+#commentform label span { color: #8d8f8f; }
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	8.	Pagination
+/*-----------------------------------------------------------------------------------*/
+
+.single-page-navigation { border-top: 1px solid #cdd0d2; }
+
+.single-portfolio-navigation { border-top: 1px solid #cdd0d2; }
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	9.	Footer Styles
+/*-----------------------------------------------------------------------------------*/
+
+#footer { color: #999; }
+
+#footer a { color: #999; }
+
+#footer a:hover { color: #2c2d31; }
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	10.	Page & Page Templates
+/*-----------------------------------------------------------------------------------*/
+
+.page .edit-post { color: #8d8f8f; }
+
+.page .edit-post a { color: #8d8f8f; }
+
+.page .edit-post a:hover { color: #515255; }
+
+
+/*-----------------------------------------------------------------------------------*/
+/*	11.	Widgets
+/*-----------------------------------------------------------------------------------*/
+
+.widget-title { color: #2c2d31; }
+
+/* Twitter Widget -----------------------*/
+
+#twitter-holder { background: url(../images/ajax-loader.gif) no-repeat center; }
+
+#sidebar .tz_tweet_widget span > a { color: #515255; }
+
+#sidebar .tz_tweet_widget span > a:hover { color: #f15755; }
+
+#sidebar .tz_tweet_widget a { color: #8d8f8f; }
+
+#sidebar .tz_tweet_widget a:hover { color: #515255; }
+
+/* Flickr Widget -------------------------*/
+
+.flickr_badge_image img {
+	background: #fff;
+	border: 3px solid #515255;
+}
+
+.flickr_badge_image img:hover { border-color: #f15755; }

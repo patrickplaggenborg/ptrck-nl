@@ -1,0 +1,74 @@
+*** Artiste Changelog ***
+
+December 11, 2012 - Version 1.1
+
+	* style.css
+		- update version number
+		- fix font family on entry-title for skill type page
+	* admin-style.css - minor tweaks
+	* theme-posttypes.php - removed internationalization of slug term
+	* theme-functions.php 
+		- used saved image IDs if WP3.5+
+		- updated get_posts_related_by_taxonomy() to pull from all related taxonomies
+	* style.css 
+		- update version number
+		- update tabs style
+	* theme-portfoliometa.php 
+		- use new WP3.5 media if available
+		- check that index exists to prevent notices
+		- upload images uses new Media functionality
+		- enqueue zilla-meta.css
+	* theme-functions.php - updated image and gallery functions for new WP 3.5 media
+	* admin-style.css - minor styling tweaks
+	* config.php - fix one_fourth column shortcode inserter
+	* functions.php - remove enqueue for removed files
+
+	ADD
+	* zilla-meta.css
+
+	REMOVE:
+	* jquery-ui-1.8.5.custom.min.js
+	* jquery.shortcodes.js
+
+August 13, 2012 - Version 1.0.3
+
+	* style.css 
+		- updated version number
+		- fixed width on 4/5 column shortcode
+	* header.php - updated copyright information
+	* functions.php
+		- Removed Google CDN of jQuery
+		- Removed Custom jQuery UI, enqueue standard libs
+
+June 18, 2012 - Version 1.0.2
+
+	* admin-interface.php - updated wp_get_theme()
+	* theme-options.php - updated wp_get_theme()
+	* plugin.js - updated file path for icon
+	* functions.php 
+		- fixed squished login logo issue
+		- fixed output of URL and theme name
+	* theme-functions.php - fixed gallery output order to sort ascending
+	* style.css - updated version number
+	
+	REMOVED:
+	* /includes
+
+December 8, 2011 - Version 1.0.1
+
+	* functions.php 
+		- updated jquery.validate file being used to version 1.9
+		- fixed wp_enqueue_scripts calls
+	* single-portfolio.php – fixed logic to hide "Related Projects" if no projects returned.
+	* upload-button.js – updated to grab correct URL in WP 3.2 and WP 3.3
+	* theme-options.php – Fixed typo
+	* config.php – Fixed shortcode title
+	* widget-twitter.php - updated for multiple instances of twitter widget
+
+	ADDED:
+	* changelog.txt
+	* twitter.js
+
+November 11, 2011
+
+	* First Release

@@ -1,0 +1,5 @@
+*** Sparks Changelog ***
+
+29 July 2013 - Version 1.0
+
+	First Release

@@ -1,0 +1,190 @@
+/*
+Theme Name:     PTRCK Portfolio
+Theme URI:      http://ptrck.nl/
+Description:    Child theme for the Artiste, based on Cargo Collective portfolio.
+Author:         Patrick Plaggenborg
+Author URI:     http://ptrck.nl/about/
+Template:       artiste
+Version:        0.1.0
+*/
+
+@import url("../artiste/style.css");
+
+ @font-face {font-family: 'Novecentowide-Light';src: url('https://ptrck.nl/fonts/20ECA6_1_0.eot');src: url('https://ptrck.nl/fonts/20ECA6_1_0.eot?#iefix') format('embedded-opentype'),url('https://ptrck.nl/fonts/20ECA6_1_0.woff') format('woff'),url('https://ptrck.nl/fonts/20ECA6_1_0.ttf') format('truetype');}
+ 
+
+
+.Novecentowide-Light { 
+    font-family: Novecentowide-Light;
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Mozilla based browsers */
+::-moz-selection {
+       background-color: #ffff66;
+       color: #503700;
+}
+
+/* Works in Safari */
+::selection {
+       background-color: #ffff66;
+       color: #503700;
+}
+
+body {
+    background: white !important;
+    text-shadow: none;
+    color: #3a3938 !important;
+}
+#sidebar {
+    background: none repeat scroll 0 0 transparent !important;
+   	width: 300px !important;
+	position: fixed;
+}
+
+#logo img {
+width: 180px;
+}
+
+.entry-content {
+width: 670px;
+margin-top: 20px;
+text-shadow: none;
+}
+#content {
+    padding: 0 10px 0 300px;
+    
+}
+
+.entry-content a:link, .entry-content a:visited {
+color: #000!important;
+border-bottom-color: #FFFF66;
+background: #ffffb9;
+}
+
+#respond a:link, #respond a:visited, .navigation a:link, .navigation a:visited {
+color: #b7b9bc;
+border-bottom: 0;
+background: none;
+}
+
+.entry-content a:hover, #respond a:hover, .navigation a:hover {
+background: #FFFF66;
+}
+
+
+.page-template-template-home-php .entry-title, .page-template-template-home-php .entry-title a, .tax-skill-type .entry-title, .tax-skill-type .entry-title a
+{ padding: 2px 3px;
+font-size: 11px;
+}
+.entry-content img {
+border: none !important;
+-webkit-box-shadow: 0 0px 0px rgba(0,0,0,.15) !important;
+-moz-box-shadow: 0 0px 0px rgba(0,0,0,.15) !important;
+box-shadow: 0 0px 0px !important;}
+
+.entry-title a:hover {
+ background: none repeat scroll 0 0 #FFFF66;
+    color: #000000 !important;
+}
+.post-thumb img {
+border: none !important;
+-webkit-box-shadow: 0 0px 0px rgba(0,0,0,.15) !important;
+-moz-box-shadow: 0 0px 0px rgba(0,0,0,.15) !important;
+box-shadow: 0 0px 0px !important;}
+
+.page-template-template-home-php .entry-title, .tax-skill-type .entry-title{
+width: 194px !important;
+}
+.page-template-template-home-php .entry-meta .entry-skills, .tax-skill-type .entry-meta .entry-skills
+{
+font-style: italic;
+}
+.entry-meta .entry-skills {
+font-style: italic;
+}
+.entry-related .entry-title{
+width:200px;
+margin:0;
+}
+h1.entry-title,.type-post .entry-title, .page-title, .type-post .entry-title a {
+color: #000000;
+font-family: Novecentowide-Light, Arial!important;
+font-weight: normal;
+font-style: normal;
+font-size: 28px !important;
+line-height: 1.5;
+text-shadow: none;
+}
+
+.post {
+	
+padding-bottom: 40px!important;
+}
+
+h2.entry-title {
+text-shadow: none;
+}
+
+.entry-related .entry-meta{position: static; width: 220px;}
+
+.entry-related li {
+margin-bottom: 18px;
+min-height: 0px !important;
+}
+
+
+.subtitle, .entry-meta a {
+color: #b7b9bc !important;
+}
+
+h3 {
+	margin-top: 34px;
+	margin-bottom: 34px;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+
+#footer {
+display: none;
+}
+
+.entry-content .entry-meta {
+display: none;	
+}
+
+
+
+.entry-meta a { text-shadow: none; }
+
+.hfeed .page-title { display: none; }
+
+.widget_nav_menu {
+padding-bottom: 0px;
+}
+
+.widget-title { display: none; }
+
+.widget_recent_entries {
+padding-bottom: 16px;	
+}
+
+#menu-about-portfolio a:link, #menu-about-portfolio a:visited, #menu-about-blog a:link, #menu-about-blog a:visited {
+color: #b7b9bc!important;
+}
+
+.archive-lists a:link, .archive-lists a:visited {
+color: #555553;	
+border-bottom: 0;
+}
+
+.archive-lists a:hover {
+color: #555553;	
+background: #FFFF66;
+}
+
+.comments_intro {
+ display: none;
+}
