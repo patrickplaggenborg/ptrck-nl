@@ -87,17 +87,56 @@ define('WP_DEBUG', filter_var(getenv('WORDPRESS_DEBUG'), FILTER_VALIDATE_BOOLEAN
  * WordPress Debug Logging
  * 
  * WP_DEBUG_LOG - Log errors to wp-content/debug.log (default: true for logging)
- * WP_DEBUG_DISPLAY - Display errors on screen (default: false for production)
+ * WP_DEBUG_DISPLAY - Display errors on screen (default: true to show in browser)
  * SAVEQUERIES - Save database queries for analysis (default: false)
  */
 define('WP_DEBUG_LOG', filter_var(getenv('WORDPRESS_DEBUG_LOG'), FILTER_VALIDATE_BOOLEAN) ?: true);
-define('WP_DEBUG_DISPLAY', filter_var(getenv('WORDPRESS_DEBUG_DISPLAY'), FILTER_VALIDATE_BOOLEAN) ?: false);
+define('WP_DEBUG_DISPLAY', filter_var(getenv('WORDPRESS_DEBUG_DISPLAY'), FILTER_VALIDATE_BOOLEAN) ?: true);
 @ini_set('display_errors', WP_DEBUG_DISPLAY ? 1 : 0);
 
 /**
  * Save database queries for analysis (optional, can impact performance)
  */
 define('SAVEQUERIES', filter_var(getenv('WORDPRESS_SAVEQUERIES'), FILTER_VALIDATE_BOOLEAN) ?: false);
+
+/**
+ * Configure PHP error logging to stderr (captured by Coolify/Docker logs)
+ * This ensures errors appear in Coolify service logs
+ */
+@ini_set('log_errors', 1);
+@ini_set('error_log', 'php://stderr');
+
+/**
+ * Custom error handler to log WordPress errors to stderr (Coolify logs)
+ * This runs before WordPress loads, so we can catch early errors too
+ */
+if (WP_DEBUG || WP_DEBUG_LOG) {
+	set_error_handler(function($errno, $errstr, $errfile, $errline) {
+		// Log to stderr (Coolify logs)
+		$error_types = array(
+			E_ERROR => 'ERROR',
+			E_WARNING => 'WARNING',
+			E_PARSE => 'PARSE',
+			E_NOTICE => 'NOTICE',
+			E_CORE_ERROR => 'CORE_ERROR',
+			E_CORE_WARNING => 'CORE_WARNING',
+			E_COMPILE_ERROR => 'COMPILE_ERROR',
+			E_COMPILE_WARNING => 'COMPILE_WARNING',
+			E_USER_ERROR => 'USER_ERROR',
+			E_USER_WARNING => 'USER_WARNING',
+			E_USER_NOTICE => 'USER_NOTICE',
+			E_STRICT => 'STRICT',
+			E_RECOVERABLE_ERROR => 'RECOVERABLE_ERROR',
+			E_DEPRECATED => 'DEPRECATED',
+			E_USER_DEPRECATED => 'USER_DEPRECATED'
+		);
+		$error_type = isset($error_types[$errno]) ? $error_types[$errno] : 'UNKNOWN';
+		$message = sprintf('[WordPress %s] %s in %s on line %d', $error_type, $errstr, $errfile, $errline);
+		error_log($message);
+		// Continue with default error handling
+		return false;
+	}, E_ALL);
+}
 
 /* That's all, stop editing! Happy blogging. */
 
