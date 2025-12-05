@@ -1,4 +1,4 @@
-FROM wordpress:latest
+FROM wordpress:php7.2-apache
 
 # Set working directory
 WORKDIR /var/www/html
@@ -19,5 +19,4 @@ RUN chmod -R 775 /var/www/html/wp-content/uploads
 EXPOSE 80
 
 # Use the default WordPress entrypoint
-# The wordpress:latest image already has the proper entrypoint configured
-
+# The wordpress:php7.2-apache image already has the proper entrypoint configured

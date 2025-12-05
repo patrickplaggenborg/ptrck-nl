@@ -11,12 +11,8 @@ Author URI: http://linkhousemedia.com
 // Featured Custom Posts Widget
 class featuredCustomPosts extends WP_Widget {
 	
-	function __construct() {
-		$widget_ops = array(
-			'classname' => 'featuredCustomPosts',
-			'description' => __('Widget that allows custom post types and taxonomies to be displayed.', 'featured-custom-posts-widget')
-		);
-		parent::__construct(false, 'Featured Custom Posts', $widget_ops);
+	function featuredCustomPosts() {
+		parent::WP_Widget(false, 'Featured Custom Posts');
 	}
 	
 	function form($instance) {

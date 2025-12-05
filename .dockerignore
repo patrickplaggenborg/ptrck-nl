@@ -54,4 +54,3 @@ composer.lock
 Dockerfile
 .dockerignore
 docker-compose.yml
-

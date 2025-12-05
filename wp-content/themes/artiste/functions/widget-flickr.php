@@ -21,14 +21,14 @@ function tz_flickr_widgets() {
 }
 
 // Widget class
-class tz_FLICKR_Widget extends WP_Widget {
+class tz_flickr_widget extends WP_Widget {
 
 
 /*-----------------------------------------------------------------------------------*/
 /*	Widget Setup
 /*-----------------------------------------------------------------------------------*/
 	
-function __construct() {
+function tz_FLICKR_Widget() {
 
 	// Widget settings
 	$widget_ops = array(
@@ -44,7 +44,7 @@ function __construct() {
 	);
 
 	// Create the widget
-	parent::__construct( 'tz_flickr_widget', __('Custom Flickr Photos', 'framework'), $widget_ops, $control_ops );
+	$this->WP_Widget( 'tz_flickr_widget', __('Custom Flickr Photos', 'framework'), $widget_ops, $control_ops );
 	
 }
 

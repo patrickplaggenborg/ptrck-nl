@@ -21,14 +21,14 @@ function tz_video_widgets() {
 }
 
 // Widget class
-class tz_Video_Widget extends WP_Widget {
+class tz_video_widget extends WP_Widget {
 
 
 /*-----------------------------------------------------------------------------------*/
 /*	Widget Setup
 /*-----------------------------------------------------------------------------------*/
 	
-function __construct() {
+function tz_Video_Widget() {
 
 	// Widget settings
 	$widget_ops = array(
@@ -44,7 +44,7 @@ function __construct() {
 	);
 
 	/* Create the widget. */
-	parent::__construct( 'tz_video_widget', __('Custom Video Widget', 'framework'), $widget_ops, $control_ops );
+	$this->WP_Widget( 'tz_video_widget', __('Custom Video Widget', 'framework'), $widget_ops, $control_ops );
 	
 }
 
