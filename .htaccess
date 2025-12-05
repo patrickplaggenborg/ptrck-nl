@@ -55,3 +55,17 @@ RewriteRule . /index.php [L]
 </IfModule>
 
 # END WordPress
+
+# BEGIN EXTRA SECURITY
+# Block XML-RPC (Prevents brute force attacks)
+<Files xmlrpc.php>
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Block User Enumeration (Prevents username guessing)
+<IfModule mod_rewrite.c>
+    RewriteCond %{QUERY_STRING} author=\d
+    RewriteRule ^ /? [L,R=301]
+</IfModule>
+# END EXTRA SECURITY
