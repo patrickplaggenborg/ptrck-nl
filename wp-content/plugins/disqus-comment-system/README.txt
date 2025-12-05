@@ -1,18 +1,22 @@
 === Disqus Comment System ===
-Contributors: disqus, alexkingorg, crowdfavorite, zeeg, tail, thetylerhayes, ryanv12, iamfrancisyo, brevityness
-Tags: comments, threaded, email, notification, spam, avatars, community, profile, widget, disqus
+Contributors: disqus, alexkingorg, crowdfavorite, zeeg, tail, thetylerhayes, ryanv12, iamfrancisyo, brevityness, tterb, chrisjtang
+Tags: disqus, comments, engagement, threaded, email, notification, spam, avatars, community, profile, widget
 Requires at least: 4.4
-Tested up to: 5.1
-Stable tag: 3.0.17
-Requires PHP: 5.4
+Tested up to: 6.8
+Stable tag: 3.1.3
+Requires PHP: 5.6
 
-Disqus is the web's most popular comment system. Use Disqus to increase engagement, retain readers, and grow your audience.
+Disqus is the web's most popular comment system. Use Disqus to increase engagement, retain readers, and grow your audience. **NEW: Disqus Polls – Engage your audiences with interactive polls, and seamlessly install them on your site.**
 
 == Description ==
 
 [Disqus](https://disqus.com/) is the web’s most popular commenting system trusted by millions of publishers to increase reader engagement, grow audience and traffic, and monetize content. Disqus helps publishers of all sizes engage directly with their audiences to build loyalty, retain readers, and foster thriving communities.
 
 The Disqus for WordPress plugin lets site owners and developers easily add Disqus to their sites, replacing the default WordPress comment system. Disqus installs in minutes and automatically imports your existing comments.
+
+In addition to our free-to-use, ad-supported Basic plan, we also offer ad-optional subscription plans that come with more advanced features and access to priority support. Please see our [pricing page](https://disqus.com/pricing/) for more details.
+
+**NEW: [Disqus Polls](https://disqus.com/polls)** – Engage your audiences with interactive polls, and seamlessly install them on your site.
 
 = Why Disqus? =
 
@@ -22,7 +26,7 @@ The Disqus for WordPress plugin lets site owners and developers easily add Disqu
 * Improve SEO ranking with user generated content
 * Keep spam out with our best-in-class anti-spam filter powered by Akismet
 * Single profile for commenting on over 4 million sites including social login support for Facebook, Twitter, and Google accounts
-* Trusted by sites like Wired, CBS, and Entertainment Weekly
+* Trusted by sites like ABC News, Entertainment Weekly, and Rotten Tomatoes
 
 = Disqus Features =
 
@@ -32,6 +36,7 @@ The Disqus for WordPress plugin lets site owners and developers easily add Disqu
 * Export comments to WordPress-compatible XML to backup or migrate to another system
 * Analytics dashboard for measuring overall engagement on your site
 * Mobile responsive design
+* **NEW: Disqus Polls** – Create and embed interactive polls directly on your site to boost engagement and gather insights from your audience.
 
 = Engagement Features =
 
@@ -42,7 +47,7 @@ The Disqus for WordPress plugin lets site owners and developers easily add Disqu
 * Flexible login options - Social login with Facebook, Twitter, and Google, SSO, and guest commenting support
 * Instant activity notifications, email notifications, and digests pull readers back in
 * User profiles that show you recent comment history and frequented communities
-* Discovery widget that shows active discussions happening elsewhere on your site
+* Recommendations widget that shows where active discussions are happening elsewhere on your site
 
 = Moderation Features =
 
@@ -80,7 +85,7 @@ Yes, you can import your existing WordPress comments into Disqus during installa
 
 = How do I set up Single Sign-On (SSO)? =
 
-SSO allows users in your database to comment without requiring them to register with Disqus. Access to SSO is currently available as an add-on for users with a [Pro subscription](https://help.disqus.com/customer/en/portal/articles/2759918-disqus-pricing-and-plans#pro-plan). If you would like to enable this feature, [contact our Support team](https://disqus.com/support/?article=contact_SSO). Also check out our guide for [setting up SSO on WordPress](https://help.disqus.com/customer/portal/articles/1148635).
+SSO allows users in your database to comment without requiring them to register with Disqus. Access to SSO is currently available as an add-on for users with a [Business subscription](https://help.disqus.com/customer/en/portal/articles/2759918-disqus-pricing-and-plans#business-plan). If you would like to enable this feature, [contact our Support team](https://disqus.com/support/?article=contact_SSO). Also check out our guide for [setting up SSO on WordPress](https://help.disqus.com/customer/portal/articles/1148635).
 
 = I’m experiencing an issue with my installation of Disqus. =
 
@@ -111,10 +116,10 @@ Go to [https://disqus.com/help/wordpress](https://disqus.com/help/wordpress)
 == Screenshots ==
 
 1. Disqus Comments
-2. Comment Reply
+2. Disqus Polls
 3. Disqus Audience Platform
 4. Featured Comment
-5. Discovery Box (part of Disqus Comments)
+5. Recommendations (part of Disqus Comments)
 6. Mentions
 7. Real-time Comments
 8. Commenter User Profile
@@ -123,6 +128,57 @@ Go to [https://disqus.com/help/wordpress](https://disqus.com/help/wordpress)
 11. Moderate by Email Notifications
 
 == Changelog ==
+= 3.1.3 =
+* Fixed bug with Disqus SSO and Gravatar Images
+* Switched DISQUSVERSION to constant (issue #139)
+* Fixed comment data issue if post author is null (issue #140)
+* Fixed various conditions missing type checks (issue #141)
+
+= 3.1.2 =
+* Add Disqus Polls Information
+
+= 3.1.1 =
+* Add WP 6.5 to Github Actions CI
+
+= 3.1 =
+* Disqus Embed now loads correctly on WordPress Block Themes.
+* Improved visibility for latest plugin version and important changes.
+* Added links to remove ads and clarified language around ad-supported plans.
+* Modernized styling and effects to match Disqus colors.
+
+= 3.0.24.1 =
+* Add WP 6.4 to Github Actions CI and fixed dependency issues for WP 6.4
+
+= 3.0.24 =
+* Fixed multiple bugs with the manual syncing tool regarding syncing comments without parents and syncing comments missing thread data.
+* Increased allowable date range for manual syncing tool to allow for easier syncing of historical comment data.
+* Improved automatic syncing tool's error messaging and troubleshooting with regards to issues with fetching sync status and starting automatic syncing.
+* Improved the error messages that get exposed to the browser console when issues occur with the manual and automatic syncing tools for easier future troubleshooting.
+
+= 3.0.23 =
+* Fixed a bug with the automatic comment import tool with newer versions of WordPress and added tests.
+* Improved visual layout of the plugin.  Updated corresponding snapshot for frontend test.
+* Added updated directions for running tests locally.
+* Update CI/CD to use GitHub actions.
+
+= 3.0.22 =
+* Added improvements to manual comment syncing (thanks Artem Russakovskii)
+* Fixed a bug with the embed handling pages with missing container IDs
+* Fixed a bug with REST URLs handling emtpy host configurations
+
+= 3.0.21 =
+* Fixed issue with mismatched DISQUSVERSION causing admin issues
+
+= 3.0.20 =
+* Fixed issue with comments syncing to one sticky post
+
+= 3.0.19 =
+* Fixed issue with missing admin bundles
+
+= 3.0.18 =
+* Tested plugin with WordPress 5.6 and updated documentation
+* Fixed count.js script being loaded on unnecessary pages
+* Fixed comments showing sync date instead of creation date in WordPress admin
 
 = 3.0.17 =
 * Bumping version for WP 5.1 version bump. (Changes to README versions and main php file's version)

@@ -73,7 +73,6 @@
 						'forum'              => 'Support Forum',
 						'email'              => 'Priority Email Support',
 						'phone'              => 'Phone Support',
-						'skype'              => 'Skype Support',
 						'is_success_manager' => 'Personal Success Manager',
 					);
 
@@ -101,10 +100,10 @@
 							}
 						}
 					}
+
+                    $this->json['plans'] = $pricing->plans;
 				}
 			}
-
-			$this->json['plans'] = $pricing->plans;
 
 			$this->json['strings'] = array(
 				'plan' => $this->fs->get_text_x_inline( 'Plan', 'as product pricing plan', 'plan' ),

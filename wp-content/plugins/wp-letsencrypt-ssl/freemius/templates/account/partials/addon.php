@@ -1,4 +1,9 @@
 <?php
+
+    if ( ! defined( 'ABSPATH' ) ) {
+        exit;
+    }
+
     /**
      * @var array    $VARS
      * @var Freemius $fs
@@ -26,7 +31,7 @@
     $downgrading_plan_text        = fs_text_inline( 'Downgrading your plan', 'downgrading-plan', $slug );
     $cancelling_subscription_text = fs_text_inline( 'Cancelling the subscription', 'cancelling-subscription', $slug );
     /* translators: %1$s: Either 'Downgrading your plan' or 'Cancelling the subscription' */
-    $downgrade_x_confirm_text     = fs_text_inline( '%1$s will immediately stop all future recurring payments and your %s plan license will expire in %s.', 'downgrade-x-confirm', $slug );
+    $downgrade_x_confirm_text     = fs_text_inline( '%1$s will immediately stop all future recurring payments and your %2$s plan license will expire in %3$s.', 'downgrade-x-confirm', $slug );
     $prices_increase_text         = fs_text_inline( 'Please note that we will not be able to grandfather outdated pricing for renewals/new subscriptions after a cancellation. If you choose to renew the subscription manually in the future, after a price increase, which typically occurs once a year, you will be charged the updated price.', 'pricing-increase-warning', $slug );
     $cancel_trial_confirm_text         = fs_text_inline( 'Cancelling the trial will immediately block access to all premium features. Are you sure?', 'cancel-trial-confirm', $slug );
     $after_downgrade_non_blocking_text = fs_text_inline( 'You can still enjoy all %s features but you will not have access to %s security & feature updates, nor support.', 'after-downgrade-non-blocking', $slug );
@@ -235,19 +240,19 @@
                         true
                     );
 
-                    $human_readable_license_expiration = human_time_diff( time(), strtotime( $license->expiration ) );
-                    $downgrade_confirmation_message    = sprintf(
-                        $downgrade_x_confirm_text,
-                        ( $fs_addon->is_only_premium() ? $cancelling_subscription_text : $downgrading_plan_text ),
-                        $plan->title,
-                        $human_readable_license_expiration
-                    );
-
                     $after_downgrade_message = ! $license->is_block_features ?
                         sprintf( $after_downgrade_non_blocking_text, $plan->title, $fs_addon->get_module_label( true ) ) :
                         sprintf( $after_downgrade_blocking_text, $plan->title );
 
                     if ( ! $license->is_lifetime() && $is_active_subscription ) {
+                        $human_readable_license_expiration = human_time_diff( time(), strtotime( $license->expiration ) );
+                        $downgrade_confirmation_message    = sprintf(
+                            $downgrade_x_confirm_text,
+                            ( $fs_addon->is_only_premium() ? $cancelling_subscription_text : $downgrading_plan_text ),
+                            $plan->title,
+                            $human_readable_license_expiration
+                        );
+
                         $buttons[] = fs_ui_get_action_button(
                             $fs->get_id(),
                             'account',
@@ -366,7 +371,7 @@
                     );
                 } else {
                     $buttons[] = sprintf(
-                        '<a target="_blank" class="button button-primary edit" href="%s">%s</a>',
+                        '<a target="_blank" rel="noopener" class="button button-primary edit" href="%s">%s</a>',
                         $fs->_get_latest_download_local_url( $addon_id ),
                         esc_html( $download_latest_text )
                     );
@@ -417,7 +422,7 @@
                     <a class="button button-primary"
                        href="<?php echo wp_nonce_url( self_admin_url( 'update.php?' . ( ( isset( $addon_info['has_paid_plan'] ) && $addon_info['has_paid_plan'] ) ? 'fs_allow_updater_and_dialog=true&' : '' ) . 'action=install-plugin&plugin=' . $addon_info['slug'] ), 'install-plugin_' . $addon_info['slug'] ) ?>"><?php fs_esc_html_echo_inline( 'Install Now', 'install-now', $slug ) ?></a>
                 <?php else : ?>
-                    <a target="_blank" class="button button-primary"
+                    <a target="_blank" rel="noopener" class="button button-primary"
                        href="<?php echo $fs->_get_latest_download_local_url( $addon_id ) ?>"><?php echo esc_html( $download_latest_text ) ?></a>
                 <?php endif ?>
             <?php endif ?>

@@ -7,9 +7,9 @@
  * @output wp-admin/js/tags.js
  */
 
- /* global ajaxurl, wpAjax, tagsl10n, showNotice, validateForm */
+ /* global ajaxurl, wpAjax, showNotice, validateForm */
 
-jQuery(document).ready(function($) {
+jQuery( function($) {
 
 	var addingTerm = false;
 
@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
 	 *
 	 * @since 2.8.0
 	 *
-	 * @returns boolean Always returns false to cancel the default event handling.
+	 * @return {boolean} Always returns false to cancel the default event handling.
 	 */
 	$( '#the-list' ).on( 'click', '.delete-tag', function() {
 		var t = $(this), tr = t.parents('tr'), r = true, data;
@@ -31,51 +31,84 @@ jQuery(document).ready(function($) {
 		if ( r ) {
 			data = t.attr('href').replace(/[^?]*\?/, '').replace(/action=delete/, 'action=delete-tag');
 
+			tr.children().css('backgroundColor', '#faafaa');
+
+			// Disable pointer events and all form controls/links in the row
+			tr.css('pointer-events', 'none');
+			tr.find(':input, a').prop('disabled', true).attr('tabindex', -1);
+
 			/**
 			 * Makes a request to the server to delete the term that corresponds to the
 			 * delete term button.
 			 *
 			 * @param {string} r The response from the server.
 			 *
-			 * @returns {void}
+			 * @return {void}
 			 */
 			$.post(ajaxurl, data, function(r){
+				var message;
 				if ( '1' == r ) {
 					$('#ajax-response').empty();
+					let nextFocus = tr.next( 'tr' ).find( 'a.row-title' );
+					let prevFocus = tr.prev( 'tr' ).find( 'a.row-title' );
+					// If there is neither a next row or a previous row, focus the tag input field.
+					if ( nextFocus.length < 1 && prevFocus.length < 1 ) {
+						nextFocus = $( '#tag-name' ).trigger( 'focus' );
+					} else {
+						if ( nextFocus.length < 1 ) {
+							nextFocus = prevFocus;
+						}
+					}
+
 					tr.fadeOut('normal', function(){ tr.remove(); });
 
 					/**
 					 * Removes the term from the parent box and the tag cloud.
 					 *
-					 * `data.match(/tag_ID=(\d+)/)[1]` matches the term id from the data variable.
-					 * This term id is then used to select the relevant HTML elements:
+					 * `data.match(/tag_ID=(\d+)/)[1]` matches the term ID from the data variable.
+					 * This term ID is then used to select the relevant HTML elements:
 					 * The parent box and the tag cloud.
 					 */
 					$('select#parent option[value="' + data.match(/tag_ID=(\d+)/)[1] + '"]').remove();
 					$('a.tag-link-' + data.match(/tag_ID=(\d+)/)[1]).remove();
-
+					nextFocus.trigger( 'focus' );
+					message = wp.i18n.__( 'The selected tag has been deleted.' );
+			
 				} else if ( '-1' == r ) {
-					$('#ajax-response').empty().append('<div class="error"><p>' + tagsl10n.noPerm + '</p></div>');
-					tr.children().css('backgroundColor', '');
+					message = wp.i18n.__( 'Sorry, you are not allowed to do that.' );
+					$('#ajax-response').empty().append('<div class="notice notice-error"><p>' + message + '</p></div>');
+					resetRowAfterFailure( tr );
 
 				} else {
-					$('#ajax-response').empty().append('<div class="error"><p>' + tagsl10n.broken + '</p></div>');
-					tr.children().css('backgroundColor', '');
+					message = wp.i18n.__( 'An error occurred while processing your request. Please try again later.' );
+					$('#ajax-response').empty().append('<div class="notice notice-error"><p>' + message + '</p></div>');
+					resetRowAfterFailure( tr );
 				}
+				wp.a11y.speak( message, 'assertive' );
 			});
-
-			tr.children().css('backgroundColor', '#f33');
 		}
 
 		return false;
 	});
 
 	/**
+	 * Restores the original UI state of a table row after an AJAX failure.
+	 *
+	 * @param {jQuery} tr The table row to reset.
+	 * @return {void}
+	 */
+	function resetRowAfterFailure( tr ) {
+		tr.children().css( 'backgroundColor', '' );
+		tr.css( 'pointer-events', '' );
+		tr.find( ':input, a' ).prop( 'disabled', false ).removeAttr( 'tabindex' );
+	}
+
+	/**
 	 * Adds a deletion confirmation when removing a tag.
 	 *
 	 * @since 4.8.0
 	 *
-	 * @returns {void}
+	 * @return {void}
 	 */
 	$( '#edittag' ).on( 'click', '.delete', function( e ) {
 		if ( 'undefined' === typeof showNotice ) {
@@ -96,13 +129,10 @@ jQuery(document).ready(function($) {
 	 *
 	 * @since 2.8.0
 	 *
-	 * @returns boolean Always returns false to cancel the default event handling.
+	 * @return {boolean} Always returns false to cancel the default event handling.
 	 */
-	$('#submit').click(function(){
+	$('#submit').on( 'click', function(){
 		var form = $(this).parents('form');
-
-		if ( ! validateForm( form ) )
-			return false;
 
 		if ( addingTerm ) {
 			// If we're adding a term, noop the button to avoid duplicate requests.
@@ -117,7 +147,7 @@ jQuery(document).ready(function($) {
 		 *
 		 * @param {string} r The response from the server.
 		 *
-		 * @returns {void}
+		 * @return {void}
 		 */
 		$.post(ajaxurl, $('#addtag').serialize(), function(r){
 			var res, parent, term, indent, i;
@@ -127,15 +157,25 @@ jQuery(document).ready(function($) {
 
 			$('#ajax-response').empty();
 			res = wpAjax.parseAjaxResponse( r, 'ajax-response' );
-			if ( ! res || res.errors )
+
+			if ( res.errors && res.responses[0].errors[0].code === 'empty_term_name' ) {
+				validateForm( form );
+			}
+
+			if ( ! res || res.errors ) {
 				return;
+			}
 
 			parent = form.find( 'select#parent' ).val();
 
-			if ( parent > 0 && $('#tag-' + parent ).length > 0 ) // If the parent exists on this page, insert it below. Else insert it at the top of the list.
-				$( '.tags #tag-' + parent ).after( res.responses[0].supplemental.noparents ); // As the parent exists, Insert the version with - - - prefixed
-			else
-				$( '.tags' ).prepend( res.responses[0].supplemental.parents ); // As the parent is not visible, Insert the version with Parent - Child - ThisTerm
+			// If the parent exists on this page, insert it below. Else insert it at the top of the list.
+			if ( parent > 0 && $('#tag-' + parent ).length > 0 ) {
+				// As the parent exists, insert the version with - - - prefixed.
+				$( '.tags #tag-' + parent ).after( res.responses[0].supplemental.noparents );
+			} else {
+				// As the parent is not visible, insert the version with Parent - Child - ThisTerm.
+				$( '.tags' ).prepend( res.responses[0].supplemental.parents );
+			}
 
 			$('.tags .no-items').remove();
 
@@ -143,7 +183,7 @@ jQuery(document).ready(function($) {
 				// Parents field exists, Add new term to the list.
 				term = res.responses[1].supplemental;
 
-				// Create an indent for the Parent field
+				// Create an indent for the Parent field.
 				indent = '';
 				for ( i = 0; i < res.responses[1].position; i++ )
 					indent += '&nbsp;&nbsp;&nbsp;';
@@ -151,7 +191,7 @@ jQuery(document).ready(function($) {
 				form.find( 'select#parent option:selected' ).after( '<option value="' + term.term_id + '">' + indent + term.name + '</option>' );
 			}
 
-			$('input[type="text"]:visible, textarea:visible', form).val('');
+			$('input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):visible, textarea:visible', form).val('');
 		});
 
 		return false;

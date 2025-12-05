@@ -287,7 +287,7 @@ class Disqus_Rest_Api {
 
             return $this->rest_get_response( $status );
         } catch ( Exception $e ) {
-            return $this->rest_get_error( 'There was an error fetching sync status.' );
+            return $this->rest_get_error( 'There was an error fetching sync status. Please go to Disqus.com and check that you are logged into a Disqus account with moderator privileges on this site, and then reload this page. For further troubleshooting, here is a 150 character error message preview: ' . substr( $e, 0, 150 ) );
         }
     }
 
@@ -304,7 +304,7 @@ class Disqus_Rest_Api {
 
             return $this->rest_get_response( $status );
         } catch ( Exception $e ) {
-            return $this->rest_get_error( 'There was an error attempting to enable syncing.' );
+            return $this->rest_get_error( 'There was an error attempting to enable automatic syncing. Please go to Disqus.com and check that you are logged into a Disqus account with moderator privileges on this site, and then reload this page. For further troubleshooting, here is a 150 character error message preview: ' . substr( $e, 0, 150 ) );
         }
     }
 
@@ -321,7 +321,7 @@ class Disqus_Rest_Api {
 
             return $this->rest_get_response( $status );
         } catch ( Exception $e ) {
-            return $this->rest_get_error( 'There was an error attempting to disable syncing.' );
+            return $this->rest_get_error( 'There was an error attempting to disable automatic syncing. Please go to Disqus.com and check that you are logged into a Disqus account with moderator privileges on this site, and then reload this page. For further troubleshooting, here is a 150 character error message preview: ' . substr( $e, 0, 150 ) );
         }
     }
 
@@ -352,7 +352,7 @@ class Disqus_Rest_Api {
         ) );
 
         // Filter out pingbacks/trackings and comments that have been created by Disqus via syncing.
-        $filtered_comments = array_filter( $comments, array( $this, 'is_pingback_or_disqus_comment' ) );
+        $filtered_comments = array_filter( $comments, array( $this, 'is_comment_exportable' ) );
 
         $response_data = array(
             'comments' => $filtered_comments,
@@ -436,14 +436,16 @@ class Disqus_Rest_Api {
     }
 
     /**
-     * Checks a comment state to determine if it's valid for syncing.
+     * Checks a comment state to determine if it's valid for exporting into Disqus.
      *
      * @since     3.0.11
      * @param     array $comment    The WordPress comment instance.
-     * @return    boolean           Whether the comment is valid for syncing.
+     * @return    boolean           Whether the comment is valid for exporting into Disqus.
      */
-    private function is_pingback_or_disqus_comment( $comment ) {
-        return empty( $comment->comment_type ) && strpos( $comment->comment_agent, 'Disqus' ) === false;
+    private function is_comment_exportable( $comment ) {
+        $is_comment = ( empty( $comment->comment_type ) || 'comment' === $comment->comment_type );
+        $is_disqus_comment = strpos( $comment->comment_agent, 'Disqus' ) !== false;
+        return $is_comment && ! $is_disqus_comment;
     }
 
     /**
@@ -455,8 +457,13 @@ class Disqus_Rest_Api {
      */
     private function get_request_data( WP_REST_Request $request ) {
         $content_type = $request->get_content_type();
+        if ( $content_type && $content_type['value'] ) {
+            $content_type_val = $content_type['value'];
+        } else {
+            $content_type_val = null;
+        }
 
-        switch ( $content_type['value'] ) {
+        switch ( $content_type_val ) {
             case 'application/json':
                 return $request->get_json_params();
             default:
@@ -492,7 +499,7 @@ class Disqus_Rest_Api {
         }
 
         // Add additional non-database options here.
-        $settings['disqus_installed'] = trim( $settings['disqus_forum_url'] ) !== '';
+        $settings['disqus_installed'] = isset( $settings['disqus_forum_url'] ) && trim( $settings['disqus_forum_url'] ) !== '';
 
         return $settings;
     }
@@ -693,7 +700,6 @@ class Disqus_Rest_Api {
         // Remove non-updating fields.
         unset( $comment_data['comment_meta'] );
         unset( $comment_data['comment_agent'] );
-        unset( $comment_data['comment_parent'] );
         unset( $comment_data['comment_type'] );
         unset( $comment_data['comment_date_gmt'] );
         unset( $comment_data['comment_post_ID'] );
@@ -726,7 +732,7 @@ class Disqus_Rest_Api {
      */
     private function comment_data_from_post( $post ) {
         $thread = array_key_exists( 'threadData', $post ) ? $post['threadData'] : $post['thread'];
-        $author = $post['author'];
+        $author = isset( $post['author'] ) ? $post['author'] : null;
 
         $wp_post_id = null;
 
@@ -734,6 +740,7 @@ class Disqus_Rest_Api {
         $post_query = new WP_Query( array(
             'meta_key' => 'dsq_thread_id',
             'meta_value' => $thread['id'],
+            'ignore_sticky_posts' => true,
         ) );
 
         if ( $post_query->have_posts() ) {
@@ -755,11 +762,9 @@ class Disqus_Rest_Api {
             update_post_meta( $wp_post_id, 'dsq_thread_id', $thread['id'] );
         }
 
-        if ( null === $wp_post_id || false == $wp_post_id ) {
-            throw new Exception( 'No post found associated with the thread.' );
-        }
-
         // Find the parent comment, if any.
+        // To simplify our syncing process and prevent syncing errors,
+        // still sync the comment even if we don't have its parent comment synced.
         $parent = 0;
         if ( null !== $post['parent'] ) {
             $parent_comment_query = new WP_Comment_Query( array(
@@ -769,9 +774,7 @@ class Disqus_Rest_Api {
             ) );
             $parent_comments = $parent_comment_query->comments;
 
-            if ( empty( $parent_comments ) ) {
-                throw new Exception( 'This comment\'s parent has not been synced yet.' );
-            } else {
+            if ( $parent_comments ) {
                 $parent = $parent_comments[0]->comment_ID;
             }
         }
@@ -779,12 +782,14 @@ class Disqus_Rest_Api {
         // Email is a special permission for Disqus API applications and won't be present
         // if the user has not set the permission for their API application.
         $author_email = null;
-        if ( isset( $author['email'] ) ) {
-            $author_email = $author['email'];
-        } elseif ( $author['isAnonymous'] ) {
-            $author_email = 'anonymized-' . md5( $author['name'] ) . '@disqus.com';
-        } else {
-            $author_email = 'user-' . $author['id'] . '@disqus.com';
+        if ( $author ) {
+            if ( isset( $author['email'] ) ) {
+                $author_email = $author['email'];
+            } elseif ( isset( $author['isAnonymous'] ) && $author['isAnonymous'] ) {
+                $author_email = 'anonymized-' . md5( $author['name'] ) . '@disqus.com';
+            } elseif ( isset( $author['id'] ) ) {
+                $author_email = 'user-' . $author['id'] . '@disqus.com';
+            }
         }
 
         // Translate the comment approval state.
@@ -801,11 +806,12 @@ class Disqus_Rest_Api {
 
         return array(
             'comment_post_ID' => (int) $wp_post_id,
-            'comment_author' => $author['name'],
+            'comment_author' => $author && isset( $author['name'] ) ? $author['name'] : 'Anonymous',
             'comment_author_email' => $author_email,
             'comment_author_IP' => $post['ipAddress'],
-            'comment_author_url' => isset( $author['url'] ) ? $author['url'] : '',
+            'comment_author_url' => $author && isset( $author['url'] ) ? $author['url'] : '',
             'comment_content' => $post['raw_message'],
+            'comment_date' => $post['createdAt'],
             'comment_date_gmt' => $post['createdAt'],
             'comment_type' => '', // Leave blank for a regular comment.
             'comment_parent' => $parent,

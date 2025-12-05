@@ -56,9 +56,10 @@ class Disqus_Public {
 	public static function remote_auth_s3_for_user( $user, $secret_key ) {
 		$payload_user = array();
 		if ( $user->ID ) {
+			$avatar_url = self::ensure_gravatar_extension( get_avatar_url( $user->ID, 92 ) );
 			$payload_user['id'] = $user->ID;
 			$payload_user['username'] = $user->display_name;
-			$payload_user['avatar'] = get_avatar_url( $user->ID, 92 );
+			$payload_user['avatar'] = $avatar_url;
 			$payload_user['email'] = $user->user_email;
 			$payload_user['url'] = $user->user_url;
 		}
@@ -78,11 +79,9 @@ class Disqus_Public {
 	 * @return    array            The embed configuration to localize the comments embed script with.
 	 */
 	public static function embed_vars_for_post( $post ) {
-		global $DISQUSVERSION;
-
 		$embed_vars = array(
 			'disqusConfig' => array(
-				'integration' => 'wordpress ' . $DISQUSVERSION,
+				'integration' => 'wordpress ' . DISQUS_VERSION . ' ' . get_bloginfo( 'version' ),
 			),
 			'disqusIdentifier' => Disqus_Public::dsq_identifier_for_post( $post ),
 			'disqusShortname' => get_option( 'disqus_forum_url' ),
@@ -108,7 +107,6 @@ class Disqus_Public {
 			$embed_vars['disqusConfig']['api_key'] = $public_key;
 			$embed_vars['disqusConfig']['remote_auth_s3'] = Disqus_Public::remote_auth_s3_for_user( $user, $secret_key );
 		}
-
 		return $embed_vars;
 	}
 
@@ -208,7 +206,9 @@ class Disqus_Public {
 	 * @since    3.0
 	 */
 	public function enqueue_comment_count() {
-		if ( $this->dsq_can_load( 'count' ) ) {
+		global $post;
+
+		if ( $this->dsq_comment_count_can_load_for_post( $post ) ) {
 
 			$count_vars = array(
 				'disqusShortname' => $this->shortname,
@@ -236,6 +236,22 @@ class Disqus_Public {
 		}
 	}
 
+    /**
+	 * Hides the comment section block for WP block themes.
+     * This prevents the WP block comment section from appearing briefly before being replaced by Disqus.
+	 *
+	 * @since    3.0
+	 */
+	public function hide_block_theme_comment_section() {
+		?>
+            <style>
+                .wp-block-comments {
+                    display: none;
+                }
+            </style>
+        <?php
+	}
+
 	/**
 	 * Determines if Disqus is configured and can load on a given page.
 	 *
@@ -258,6 +274,34 @@ class Disqus_Public {
         $site_allows_load = apply_filters( 'dsq_can_load', $script_name );
 		if ( is_bool( $site_allows_load ) ) {
 			return $site_allows_load;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Determines if Disqus is configured and should load the comment count script on a given page.
+	 *
+	 * @since     3.0.18
+	 * @access    private
+	 * @param     WP_Post $post    The WordPress post used to determine if Disqus can be loaded.
+	 * @return    boolean          Whether Disqus is configured properly and should load the comment count on the current page.
+	 */
+	private function dsq_comment_count_can_load_for_post( $post ) {
+		// Checks if the plugin is configured properly
+		// and is a valid page.
+		if ( ! $this->dsq_can_load( 'count' ) ) {
+			return false;
+		}
+
+		// Make sure we have a $post object.
+		if ( ! isset( $post ) ) {
+			return false;
+		}
+
+		// Make sure comments are open if it's a single post page.
+		if ( is_singular() && ! comments_open() ) {
+			return false;
 		}
 
 		return true;
@@ -312,5 +356,37 @@ class Disqus_Public {
 		}
 
 		return true;
+	}
+
+	/**
+	 * By default, WP uses Gravatar for its avatars without an image extension, but our SSO payload expects an extension,
+	 * so this function ensures a Gravatar URL ends with .jpg before query params and leaves other URLs unchanged.
+	 * Source: https://docs.gravatar.com/sdk/images/
+	 *
+	 * @since     3.1.3
+	 * @access    private
+	 * @param     string $avatar_url     The avatar URL to check.
+	 * @param     string $ext            The extension to append, default is '.jpg'.
+	 * @return    string                 The modified avatar URL with the correct extension.
+	 */
+	private static function ensure_gravatar_extension( $avatar_url, $ext = '.jpg' ) {
+		if ( '.' !== $ext[0] ) {
+			$ext = '.' . $ext;
+		}
+
+		$query_pos = strpos( $avatar_url, '?' );
+		$base = ( false !== $query_pos ) ? substr( $avatar_url, 0, $query_pos ) : $avatar_url;
+		if ( substr( $base, -strlen( $ext ) ) === $ext ) {
+			return $avatar_url;
+		}
+
+		if ( false !== stripos( $avatar_url, 'gravatar.com' ) ) {
+			if ( false !== $query_pos ) {
+				return substr( $avatar_url, 0, $query_pos ) . $ext . substr( $avatar_url, $query_pos );
+			} else {
+				return $avatar_url . $ext;
+			}
+		}
+		return $avatar_url;
 	}
 }

@@ -51,6 +51,7 @@ class WP_Widget_Media_Gallery extends WP_Widget_Media {
 	 * @see WP_REST_Controller::get_item_schema()
 	 * @see WP_REST_Controller::get_additional_fields()
 	 * @link https://core.trac.wordpress.org/ticket/35574
+	 *
 	 * @return array Schema for properties.
 	 */
 	public function get_instance_schema() {
@@ -108,7 +109,6 @@ class WP_Widget_Media_Gallery extends WP_Widget_Media {
 	 * @since 4.9.0
 	 *
 	 * @param array $instance Widget instance props.
-	 * @return void
 	 */
 	public function render_media( $instance ) {
 		$instance = array_merge( wp_list_pluck( $this->get_instance_schema(), 'default' ), $instance );
@@ -148,8 +148,8 @@ class WP_Widget_Media_Gallery extends WP_Widget_Media {
 			$handle,
 			sprintf(
 				'wp.mediaWidgets.modelConstructors[ %s ].prototype.schema = %s;',
-				wp_json_encode( $this->id_base ),
-				wp_json_encode( $exported_schema )
+				wp_json_encode( $this->id_base, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $exported_schema, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			)
 		);
 
@@ -160,9 +160,9 @@ class WP_Widget_Media_Gallery extends WP_Widget_Media {
 					wp.mediaWidgets.controlConstructors[ %1$s ].prototype.mime_type = %2$s;
 					_.extend( wp.mediaWidgets.controlConstructors[ %1$s ].prototype.l10n, %3$s );
 				',
-				wp_json_encode( $this->id_base ),
-				wp_json_encode( $this->widget_options['mime_type'] ),
-				wp_json_encode( $this->l10n )
+				wp_json_encode( $this->id_base, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $this->widget_options['mime_type'], JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $this->l10n, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			)
 		);
 	}
@@ -240,7 +240,6 @@ class WP_Widget_Media_Gallery extends WP_Widget_Media {
 	 * Whether the widget has content to show.
 	 *
 	 * @since 4.9.0
-	 * @access protected
 	 *
 	 * @param array $instance Widget instance props.
 	 * @return bool Whether widget has content.
@@ -248,6 +247,8 @@ class WP_Widget_Media_Gallery extends WP_Widget_Media {
 	protected function has_content( $instance ) {
 		if ( ! empty( $instance['ids'] ) ) {
 			$attachments = wp_parse_id_list( $instance['ids'] );
+			// Prime attachment post caches.
+			_prime_post_caches( $attachments, false, false );
 			foreach ( $attachments as $attachment ) {
 				if ( 'attachment' !== get_post_type( $attachment ) ) {
 					return false;

@@ -1,3 +1,114 @@
+= 20231220 =
+ * Added checks: Style Variations tag for block theme
+ * Update: Team name from Theme Review Team to Themes Team 
+ * Tested with WordPress 6.4 
+
+= 20230417 =
+ * Fixed Full Site Editing tag for block theme in WordPress.org 
+
+= 20230412 =
+ * Added checks: Full Site Editing tag for block theme
+ * Added checks: Update URI in style.css header
+ * Added checks: Style Variations tag to the list of valid tags
+ * Fix: PHPCS for WP version lower than 8.x
+ * Fix: PHPCS issues
+ * Update: Composer version 
+
+= 20220929 =
+ * Update: Removed index.php requirements for block theme
+
+= 20211203 =
+ * Update: FSE theme folders to the new proposed structure
+
+= 20210921 =
+* Fix: `tc_filename()` to always return theme-relative paths when possible.
+* Fix: Correct the block theme adaptation check to work in WordPress.org Theme Uploader
+* Fix: Update the texts of the script tag check and the WP_Filesystem check.
+* Fix: Allow pre, link and code tags when presenting the result.
+* Fix: Allow phpcs.xml and development tool configuration files (postcss, stylelint etc).
+* Fix: Correct the theme information display on the plugin page.
+* Fix: Add template-editing to the list of allowed tags.
+* Fix: Solve PHP notice in the i18n check.
+* Reduce the severity level of the following checks:
+    Favicon, wp_title, title tag
+* Added checks:
+    Requires PHP versioning, Tested up to versioning, add_role, copyright notice
+* Removed checks:
+    content_width, Theme URI and Author URI must not be the same, emoji scripts
+
+= 20210617 =
+* Introduced a generic function, run_themechecks_against_theme(), that allows it to be run against a WP_Theme instance, rather than relying upon global state
+* Adapted checks for block themes. Create a list of the checks that are skipped for block themes (full site editing themes)
+* Fix: Avoid false positives in title checks
+* Fix invalid regular expression in the customizer check
+* Fix: Avoid false positives when .svn/.git/.hg/.bzr exists within the path to a theme
+* Fix: Allow .map files
+* Fix Non GPL sites check: Adjust the unsplash text, add vecteezy and update a link for undraw that was not correct
+* Fixed a bug where all the theme information was not showing on the plugins admin page
+* Added a check for files required by block themes
+* Added checks for block patterns and block styles
+* Added checks for custom logo, html5, responsive embeds, align-wide, wp-block-styles
+* Split the Style_Needed check into two: Screen_Reader_Text_Check and Style_CSS_Header_Check
+* Split the Title_Checks into two: Title_Check and Theme_Support_Title_Tag_Check
+* Removed warnings about file_get_contents() and encourages it's usage over WP_Filesystem for general IO operations
+* New error message for HTTP methods, to use the WordPress HTTP library instead
+* Removed dep_recommended.php and moved items into class-deprecated-check.php
+* Removed unused code from the file names check
+* Codestyle improvements, including new file names for checks
+* Reduce the severity level of the following checks:
+    Admin menu, comments, comment reply, content width, gravatar, pagination, post formats, 
+    script tag, search form, suggested styles, tags
+
+= 20200922.1 =
+* Reformatting of main.php and checkbase.php
+* Additions to malware checks in badthings.php
+* Spacing fix in postthumb.php
+* Improved check for tags in styletags.php
+
+= 20200731.1 =
+* Added add_menu_page & add_submenu_page to the allowed functions list
+* Added loco.xml to the allowed files list and extend the allowlist check functionality to support an array of (possible) filenames.
+* Updated error messages 
+
+= 20200611.1 =
+* Added escaping checks
+* Added tested up to and Requires PHP checks for the style.css
+* Added register_block_type to plugin territory check
+* Check for remove_action wp_head
+* Changed some checks from errors to warnings
+* Updated error messages
+* Updated regex for non printable characters
+* Fixed parse errors
+* Removed unused functions
+
+= 20200504.1 =
+* Contributor and URI adjustments
+* site_url checks
+* smarter nav menu and favicon checks
+* additional filename blacklist checks
+* developer files added to github (phpcs, composer, attributes, gitignore, etc)
+* improvements to existing checks, move some warnings to required to reflect updated guidelines
+* check for themes being copies of underscores
+* check for non-gpl-compatible sites used for images
+* Add warnings for demo content
+* Update links in messages to point to new development and documentation locations
+* disallow dashboard widgets in themes
+
+= 20190801.1 =
+* Fix missing nonce and nonce check on admin page. props Steven Stern for reporting the issue to the plugins team. Though this is technically a CSRF, there is no vulnerability arising from it, as the only thing that could be done with the form is to scan a theme.
+
+= 20190208.1 =
+* Add new styles for the block editor. See https://meta.trac.wordpress.org/ticket/3921
+
+= 20160523.1 =
+* Fix for theme-names with dashes in them
+* Comments stripping changes
+* Many changes by the theme review team and others. See Github for full change list.
+
+= 20151211.1 =
+* Full sync with Github and all the changes that have happened there.
+* Release for 4.4 deprecated functions.
+
 = 20140929.1 =
 * Added new checks and updates from Frank Klein at Automattic. Thanks Frank!
 * Updated deprecated function listings
@@ -48,11 +159,11 @@
 * Add check for wp_link_pages() + fix eval() check
 
 = 20110219.2 =
-* Merged new UI props Gua Bob [1](http://guabob.com/) 
+* Merged new UI props Gua Bob [1](http://guabob.com/)
 * Last tested theme is always pre-selected in the themes list.
 * Fixed php error in admin_menu.php
 
-= 20110219.1 = 
+= 20110219.1 =
 * See [commit log](https://github.com/Pross/theme-check/commits/) for changes.
 
 = 20110201.2 =

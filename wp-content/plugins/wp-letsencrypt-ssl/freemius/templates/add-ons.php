@@ -332,11 +332,11 @@
                                                 }
                                             ?>
                                             <?php else : ?>
-                                            <a target="_blank" class="button button-primary" href="<?php echo $latest_download_local_url ?>"><?php echo esc_html( $download_latest_text ) ?></a>
+                                            <a target="_blank" rel="noopener" class="button button-primary" href="<?php echo $latest_download_local_url ?>"><?php echo esc_html( $download_latest_text ) ?></a>
                                             <?php endif ?>
                                             <div class="button button-primary fs-dropdown-arrow-button"><span class="fs-dropdown-arrow"></span><ul class="fs-dropdown-list" style="display: none">
 		                                            <?php if ( $is_allowed_to_install && ! empty( $latest_download_local_url ) ) : ?>
-			                                            <li><a target="_blank" href="<?php echo $latest_download_local_url ?>"><?php echo esc_html( $download_latest_text ) ?></a></li>
+			                                            <li><a target="_blank" rel="noopener" href="<?php echo $latest_download_local_url ?>"><?php echo esc_html( $download_latest_text ) ?></a></li>
 		                                            <?php endif ?>
 		                                            <li><?php
 				                                            echo sprintf(
@@ -374,6 +374,12 @@
 	</div>
 	<script type="text/javascript">
 		(function( $, undef ) {
+			$( 'a.thickbox' ).on( 'click', function () {
+				setTimeout( function () {
+					$( '#TB_window' ).addClass( 'plugin-details-modal' );
+				}, 0 );
+			} );
+
 			<?php if ( $open_addon ) : ?>
 
 			var interval = setInterval(function () {
@@ -491,12 +497,3 @@
 	if ( $has_tabs ) {
 		$fs->_add_tabs_after_content();
 	}
-
-	$params = array(
-		'page'           => 'addons',
-		'module_id'      => $fs->get_id(),
-		'module_type'    => $fs->get_module_type(),
-		'module_slug'    => $slug,
-		'module_version' => $fs->get_plugin_version(),
-	);
-	fs_require_template( 'powered-by.php', $params );

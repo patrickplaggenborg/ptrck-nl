@@ -2,6 +2,8 @@
 
 namespace WPLEClient;
 
+use WPLE_Trait;
+use WPLEClient\Exceptions\LEConnectorException;
 /**
  * LetsEncrypt Connector class, containing the functions necessary to sign with JSON Web Key and Key ID, and perform GET, POST and HEAD requests.
  *
@@ -35,287 +37,288 @@ namespace WPLEClient;
  * @link       https://github.com/yourivw/LEClient
  * @since      Class available since Release 1.0.0
  */
-class WPLEConnector
-{
-  public $baseURL;
-  public $accountKeys;
+class LEConnector {
+    public $baseURL;
 
-  private $nonce;
+    public $accountKeys;
 
-  public $keyChange;
-  public $newAccount;
-  public $newNonce;
-  public $newOrder;
-  public $revokeCert;
+    private $nonce;
 
-  public $accountURL;
-  public $accountDeactivated = false;
+    public $keyChange;
 
-  private $log;
+    public $newAccount;
 
-  /**
-   * Initiates the LetsEncrypt Connector class.
-   *
-   * @param int 		$log			The level of logging. Defaults to no logging. LOG_OFF, LOG_STATUS, LOG_DEBUG accepted.
-   * @param string	$baseURL 		The LetsEncrypt server URL to make requests to.
-   * @param array		$accountKeys 	Array containing location of account keys files.
-   */
-  public function __construct($log, $baseURL, $accountKeys)
-  {
+    public $newNonce;
 
-    foreach ($accountKeys as $id => $pky) {
-      $accountKeys[$id] = str_ireplace(ABSPATH . ABSPATH, ABSPATH, $pky);
-    }
+    public $newOrder;
 
-    $this->baseURL = $baseURL;
-    $this->accountKeys = $accountKeys;
-    $this->log = $log;
-    $this->getLEDirectory();
-    $this->getNewNonce();
-  }
+    public $revokeCert;
 
-  /**
-   * Requests the LetsEncrypt Directory and stores the necessary URLs in this LetsEncrypt Connector instance.
-   */
-  private function getLEDirectory()
-  {
-    $req = $this->get('/directory');
-    $this->keyChange = $req['body']['keyChange'];
-    $this->newAccount = $req['body']['newAccount'];
-    $this->newNonce = $req['body']['newNonce'];
-    $this->newOrder = $req['body']['newOrder'];
-    $this->revokeCert = $req['body']['revokeCert'];
-  }
+    public $accountURL;
 
-  /**
-   * Requests a new nonce from the LetsEncrypt server and stores it in this LetsEncrypt Connector instance.
-   */
-  private function getNewNonce()
-  {
-    if ($this->head($this->newNonce)['status'] !== 200) throw new \RuntimeException('No new nonce.');
-  }
+    public $accountDeactivated = false;
 
-  /**
-   * Makes a Curl request.
-   *
-   * @param string	$method	The HTTP method to use. Accepting GET, POST and HEAD requests.
-   * @param string 	$URL 	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
-   * @param object 	$data  	The body to attach to a POST request. Expected as a JSON encoded string.
-   *
-   * @return array 	Returns an array with the keys 'request', 'header', 'status' and 'body'.
-   */
-  private function request($method, $URL, $data = null)
-  {
-    if ($this->accountDeactivated) throw new \RuntimeException('The account was deactivated. No further requests can be made.');
+    private $log;
 
-    ///$headers = array('Accept: application/json', 'Content-Type: application/jose+json');
-    $requestURL = preg_match('~^http~', $URL) ? $URL : $this->baseURL . $URL;
+    private $sourceIp = false;
 
-    $wple_args = array(
-      'headers' => array(
-        "Content-Type" => "application/jose+json",
-        "Accept" => "application/json"
-      ),
-    );
-
-    // $handle = curl_init();
-    // curl_setopt($handle, CURLOPT_URL, $requestURL);
-    // curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
-    // curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-    // curl_setopt($handle, CURLOPT_HEADER, true);
-
-    switch ($method) {
-      case 'GET':
-        break;
-      case 'POST':
-        $wple_args['method'] = 'POST';
-        $wple_args['body'] = $data;
-        ///curl_setopt($handle, CURLOPT_POST, true);
-        ///curl_setopt($handle, CURLOPT_POSTFIELDS, $data);
-        break;
-      case 'HEAD':
-        $wple_args['method'] = 'HEAD';
-        ///curl_setopt($handle, CURLOPT_CUSTOMREQUEST, 'HEAD');
-        ///curl_setopt($handle, CURLOPT_NOBODY, true);
-        break;
-      default:
-        throw new \RuntimeException('HTTP request ' . $method . ' not supported.');
-        break;
-    }
-    ///$response = curl_exec($handle);
-    $response = wp_remote_request($requestURL, $wple_args);
-
-    // if(curl_errno($handle)) {
-    //     throw new \RuntimeException('Curl: ' . curl_error($handle));
-    // }
-
-    if (is_wp_error($response)) {
-      throw new \RuntimeException('Connector Error: ' . $response->get_error_message());
-    }
-
-    //$headerSize = curl_getinfo($handle, CURLINFO_HEADER_SIZE);
-    //$statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-
-    //$header  = $response['http_response']->get_headers();
-    //$headerSize = stripos($rawheader, '{');
-    $statusCode = wp_remote_retrieve_response_code($response);
-
-    //$header = substr($response, 0, $headerSize);
-    //$body = substr($response, $headerSize);
-    $header = wp_remote_retrieve_headers($response);
-    $header = $header->getAll();
-    $body = wp_remote_retrieve_body($response);
-
-    $jsonbody = json_decode($body, true);
-    $jsonresponse = array(
-      'request' => $method . ' ' . $requestURL,
-      'header' => $header,
-      'status' => $statusCode,
-      'body' => $jsonbody === null ? $body : $jsonbody,
-    );
-
-    // $hh = fopen(WPLE_DIR . 'headers.log', 'a');
-    // fwrite($hh, print_r($header));
-    // fclose($hh);
-
-    if ($this->log instanceof \Psr\Log\LoggerInterface) {
-      $this->log->debug($method . ' response received', $jsonresponse);
-    } elseif ($this->log >= WPLEClient::LOG_DEBUG) WPLEFunctions::log($jsonresponse);
-
-    if ((($method == 'POST' or $method == 'GET') and $statusCode !== 200 and $statusCode !== 201) or ($method == 'HEAD' and $statusCode !== 200)
+    /**
+     * Initiates the LetsEncrypt Connector class.
+     *
+     * @param int 		$log			The level of logging. Defaults to no logging. LOG_OFF, LOG_STATUS, LOG_DEBUG accepted.
+     * @param string	$baseURL 		The LetsEncrypt server URL to make requests to.
+     * @param array		$accountKeys 	Array containing location of account keys files.
+     */
+    public function __construct(
+        $log,
+        $baseURL,
+        $accountKeys,
+        $sourceIp = false
     ) {
-      if (($statusCode == 429 || $statusCode == 400) && array_key_exists('detail', $jsonresponse['body'])) {
-        throw new \RuntimeException($jsonresponse['body']['detail']);
-      } else {
-        //special case to be handled
-        throw new \RuntimeException('Invalid response, header: ' . json_encode($header));
-      }
+        foreach ( $accountKeys as $id => $pky ) {
+            $accountKeys[$id] = str_ireplace( ABSPATH . ABSPATH, ABSPATH, $pky );
+        }
+        $this->baseURL = $baseURL;
+        $this->accountKeys = $accountKeys;
+        $this->log = $log;
+        $this->sourceIp = $sourceIp;
+        $this->getLEDirectory();
+        $this->getNewNonce();
     }
 
-    //if (preg_match('~Replay\-Nonce: (\S+)~i', $header, $matches)) {
-    //$this->nonce = trim($matches[1]);
-    if (array_key_exists('replay-nonce', $header)) {
-      $this->nonce = trim($header['replay-nonce']);
-    } else {
-      if ($method == 'POST') $this->getNewNonce(); // Not expecting a new nonce with GET and HEAD requests.
+    /**
+     * Requests the LetsEncrypt Directory and stores the necessary URLs in this LetsEncrypt Connector instance.
+     */
+    private function getLEDirectory() {
+        $req = $this->get( '/directory' );
+        $this->keyChange = $req['body']['keyChange'];
+        $this->newAccount = $req['body']['newAccount'];
+        $this->newNonce = $req['body']['newNonce'];
+        $this->newOrder = $req['body']['newOrder'];
+        $this->revokeCert = $req['body']['revokeCert'];
     }
 
-    return $jsonresponse;
-  }
+    /**
+     * Requests a new nonce from the LetsEncrypt server and stores it in this LetsEncrypt Connector instance.
+     */
+    private function getNewNonce() {
+        if ( $this->head( $this->newNonce )['status'] !== 200 ) {
+            throw LEConnectorException::NoNewNonceException();
+        }
+    }
 
-  /**
-   * Makes a GET request.
-   *
-   * @param string	$url 	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
-   *
-   * @return array 	Returns an array with the keys 'request', 'header', 'status' and 'body'.
-   */
-  public function get($url)
-  {
-    return $this->request('GET', $url);
-  }
+    /**
+     * Makes a Curl request.
+     *
+     * @param string	$method	The HTTP method to use. Accepting GET, POST and HEAD requests.
+     * @param string 	$URL 	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
+     * @param object 	$data  	The body to attach to a POST request. Expected as a JSON encoded string.
+     *
+     * @return array 	Returns an array with the keys 'request', 'header', 'status' and 'body'.
+     */
+    private function request( $method, $URL, $data = null ) {
+        if ( $this->accountDeactivated ) {
+            throw LEConnectorException::AccountDeactivatedException();
+        }
+        $headers = array('Accept: application/json', 'Content-Type: application/jose+json');
+        $requestURL = ( preg_match( '~^http~', $URL ) ? $URL : $this->baseURL . $URL );
+        $handle = curl_init();
+        curl_setopt( $handle, CURLOPT_URL, $requestURL );
+        curl_setopt( $handle, CURLOPT_HTTPHEADER, $headers );
+        curl_setopt( $handle, CURLOPT_RETURNTRANSFER, true );
+        curl_setopt( $handle, CURLOPT_HEADER, true );
+        curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, false );
+        // }
+        switch ( $method ) {
+            case 'GET':
+                break;
+            case 'POST':
+                curl_setopt( $handle, CURLOPT_POST, true );
+                curl_setopt( $handle, CURLOPT_POSTFIELDS, $data );
+                break;
+            case 'HEAD':
+                curl_setopt( $handle, CURLOPT_CUSTOMREQUEST, 'HEAD' );
+                curl_setopt( $handle, CURLOPT_NOBODY, true );
+                break;
+            default:
+                throw LEConnectorException::MethodNotSupportedException( esc_html( $method ) );
+                break;
+        }
+        $response = curl_exec( $handle );
+        if ( curl_errno( $handle ) ) {
+            throw LEConnectorException::CurlErrorException( esc_html( curl_error( $handle ) ) );
+        }
+        $headerSize = curl_getinfo( $handle, CURLINFO_HEADER_SIZE );
+        $statusCode = curl_getinfo( $handle, CURLINFO_HTTP_CODE );
+        $header = substr( $response, 0, $headerSize );
+        $body = substr( $response, $headerSize );
+        $jsonbody = json_decode( $body, true );
+        $jsonresponse = array(
+            'sourceip' => $this->sourceIp,
+            'request'  => $method . ' ' . $requestURL,
+            'header'   => $header,
+            'status'   => $statusCode,
+            'body'     => ( $jsonbody === null ? $body : $jsonbody ),
+        );
+        if ( $this->log instanceof \Psr\Log\LoggerInterface ) {
+            ///$this->log->debug($method . ' response received', $jsonresponse);
+        } elseif ( $this->log >= LEClient::LOG_DEBUG ) {
+            LEFunctions::log( $jsonresponse );
+        } elseif ( stripos( $requestURL, 'authz' ) && $method == 'POST' ) {
+            $res_data = $jsonresponse['body'];
+            if ( array_key_exists( 'status', $res_data ) && $res_data['status'] == 'invalid' ) {
+                if ( isset( $res_data['challenges'][0]['error'] ) ) {
+                    LEFunctions::log( 'Authorization Error: ' . json_encode( $res_data['challenges'][0]['error'] ) );
+                }
+            }
+        }
+        if ( preg_match( '~Replay\\-Nonce: (\\S+)~i', $header, $matches ) ) {
+            $this->nonce = trim( $matches[1] );
+        } else {
+            if ( $method == 'POST' ) {
+                $this->getNewNonce();
+            }
+            // Not expecting a new nonce with GET and HEAD requests.
+        }
+        if ( ($method == 'POST' or $method == 'GET') and $statusCode !== 200 and $statusCode !== 201 or $method == 'HEAD' and $statusCode !== 200 ) {
+            //Ex: Invalid response: 429 (Rate limit for \'/directory\' reached)
+            // if ($this->sourceIp !== false && get_option('wple_sourceip_enable') === false) {
+            //   LEFunctions::log("Invalid response without source IP: " . $jsonresponse);
+            //   update_option('wple_sourceip_enable', true);
+            //   $this->request($method, $URL, $data); //re-call once
+            // } else {
+            throw LEConnectorException::InvalidResponseException( $jsonresponse );
+            // }
+        }
+        return $jsonresponse;
+    }
 
-  /**
-   * Makes a POST request.
-   *
-   * @param string 	$url	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
-   * @param object 	$data	The body to attach to a POST request. Expected as a json string.
-   *
-   * @return array 	Returns an array with the keys 'request', 'header', 'status' and 'body'.
-   */
-  public function post($url, $data = null)
-  {
-    return $this->request('POST', $url, $data);
-  }
+    /**
+     * Makes a GET request.
+     *
+     * @param string	$url 	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
+     *
+     * @return array 	Returns an array with the keys 'request', 'header', 'status' and 'body'.
+     */
+    public function get( $url ) {
+        return $this->request( 'GET', $url );
+    }
 
-  /**
-   * Makes a HEAD request.
-   *
-   * @param string 	$url	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
-   *
-   * @return array	Returns an array with the keys 'request', 'header', 'status' and 'body'.
-   */
-  public function head($url)
-  {
-    return $this->request('HEAD', $url);
-  }
+    /**
+     * Makes a POST request.
+     *
+     * @param string 	$url	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
+     * @param object 	$data	The body to attach to a POST request. Expected as a json string.
+     *
+     * @return array 	Returns an array with the keys 'request', 'header', 'status' and 'body'.
+     */
+    public function post( $url, $data = null ) {
+        return $this->request( 'POST', $url, $data );
+    }
 
-  /**
-   * Generates a JSON Web Key signature to attach to the request.
-   *
-   * @param array 	$payload		The payload to add to the signature.
-   * @param string	$url 			The URL to use in the signature.
-   * @param string 	$privateKeyFile The private key to sign the request with. Defaults to 'private.pem'. Defaults to accountKeys[private_key].
-   *
-   * @return string	Returns a JSON encoded string containing the signature.
-   */
-  public function signRequestJWK($payload, $url, $privateKeyFile = '')
-  {
-    if ($privateKeyFile == '') $privateKeyFile = $this->accountKeys['private_key'];
-    $privateKey = openssl_pkey_get_private(file_get_contents($privateKeyFile));
-    $details = openssl_pkey_get_details($privateKey);
+    /**
+     * Makes a HEAD request.
+     *
+     * @param string 	$url	The URL or partial URL to make the request to. If it is partial, the baseURL will be prepended.
+     *
+     * @return array	Returns an array with the keys 'request', 'header', 'status' and 'body'.
+     */
+    public function head( $url ) {
+        return $this->request( 'HEAD', $url );
+    }
 
-    $protected = array(
-      "alg" => "RS256",
-      "jwk" => array(
-        "kty" => "RSA",
-        "n" => WPLEFunctions::Base64UrlSafeEncode($details["rsa"]["n"]),
-        "e" => WPLEFunctions::Base64UrlSafeEncode($details["rsa"]["e"]),
-      ),
-      "nonce" => $this->nonce,
-      "url" => $url
-    );
+    /**
+     * Generates a JSON Web Key signature to attach to the request.
+     *
+     * @param array 	$payload		The payload to add to the signature.
+     * @param string	$url 			The URL to use in the signature.
+     * @param string 	$privateKeyFile The private key to sign the request with. Defaults to 'private.pem'. Defaults to accountKeys[private_key].
+     *
+     * @return string	Returns a JSON encoded string containing the signature.
+     */
+    public function signRequestJWK( $payload, $url, $privateKeyFile = '' ) {
+        if ( $privateKeyFile == '' ) {
+            $privateKeyFile = $this->accountKeys['private_key'];
+        }
+        if ( !file_exists( $privateKeyFile ) ) {
+            WPLE_Trait::wple_logger(
+                "Could not create key files due to file permission issues. Please check if public_html/keys/ folder permission is set to 0755. You can still generate premium SSL certificate in Annual <b>PRO</b> Plan without these requirements.",
+                "error",
+                "a",
+                true
+            );
+        }
+        $privateKey = openssl_pkey_get_private( file_get_contents( $privateKeyFile ) );
+        $details = openssl_pkey_get_details( $privateKey );
+        $protected = array(
+            "alg"   => "RS256",
+            "jwk"   => array(
+                "kty" => "RSA",
+                "n"   => LEFunctions::Base64UrlSafeEncode( $details["rsa"]["n"] ),
+                "e"   => LEFunctions::Base64UrlSafeEncode( $details["rsa"]["e"] ),
+            ),
+            "nonce" => $this->nonce,
+            "url"   => $url,
+        );
+        $payload64 = LEFunctions::Base64UrlSafeEncode( str_replace( '\\/', '/', ( is_array( $payload ) ? json_encode( $payload ) : $payload ) ) );
+        $protected64 = LEFunctions::Base64UrlSafeEncode( json_encode( $protected ) );
+        openssl_sign(
+            $protected64 . '.' . $payload64,
+            $signed,
+            $privateKey,
+            "SHA256"
+        );
+        $signed64 = LEFunctions::Base64UrlSafeEncode( $signed );
+        $data = array(
+            'protected' => $protected64,
+            'payload'   => $payload64,
+            'signature' => $signed64,
+        );
+        return json_encode( $data );
+    }
 
-    $payload64 = WPLEFunctions::Base64UrlSafeEncode(str_replace('\\/', '/', is_array($payload) ? json_encode($payload) : $payload));
-    $protected64 = WPLEFunctions::Base64UrlSafeEncode(json_encode($protected));
+    /**
+     * Generates a Key ID signature to attach to the request.
+     *
+     * @param array 	$payload		The payload to add to the signature.
+     * @param string	$kid			The Key ID to use in the signature.
+     * @param string	$url 			The URL to use in the signature.
+     * @param string 	$privateKeyFile The private key to sign the request with. Defaults to 'private.pem'. Defaults to accountKeys[private_key].
+     *
+     * @return string	Returns a JSON encoded string containing the signature.
+     */
+    public function signRequestKid(
+        $payload,
+        $kid,
+        $url,
+        $privateKeyFile = ''
+    ) {
+        if ( $privateKeyFile == '' ) {
+            $privateKeyFile = $this->accountKeys['private_key'];
+        }
+        $privateKey = openssl_pkey_get_private( file_get_contents( $privateKeyFile ) );
+        $details = openssl_pkey_get_details( $privateKey );
+        $protected = array(
+            "alg"   => "RS256",
+            "kid"   => $kid,
+            "nonce" => $this->nonce,
+            "url"   => $url,
+        );
+        $payload64 = LEFunctions::Base64UrlSafeEncode( str_replace( '\\/', '/', ( is_array( $payload ) ? json_encode( $payload ) : $payload ) ) );
+        $protected64 = LEFunctions::Base64UrlSafeEncode( json_encode( $protected ) );
+        openssl_sign(
+            $protected64 . '.' . $payload64,
+            $signed,
+            $privateKey,
+            "SHA256"
+        );
+        $signed64 = LEFunctions::Base64UrlSafeEncode( $signed );
+        $data = array(
+            'protected' => $protected64,
+            'payload'   => $payload64,
+            'signature' => $signed64,
+        );
+        return json_encode( $data );
+    }
 
-    openssl_sign($protected64 . '.' . $payload64, $signed, $privateKey, "SHA256");
-    $signed64 = WPLEFunctions::Base64UrlSafeEncode($signed);
-
-    $data = array(
-      'protected' => $protected64,
-      'payload' => $payload64,
-      'signature' => $signed64
-    );
-
-    return json_encode($data);
-  }
-
-  /**
-   * Generates a Key ID signature to attach to the request.
-   *
-   * @param array 	$payload		The payload to add to the signature.
-   * @param string	$kid			The Key ID to use in the signature.
-   * @param string	$url 			The URL to use in the signature.
-   * @param string 	$privateKeyFile The private key to sign the request with. Defaults to 'private.pem'. Defaults to accountKeys[private_key].
-   *
-   * @return string	Returns a JSON encoded string containing the signature.
-   */
-  public function signRequestKid($payload, $kid, $url, $privateKeyFile = '')
-  {
-    if ($privateKeyFile == '') $privateKeyFile = $this->accountKeys['private_key'];
-    $privateKey = openssl_pkey_get_private(file_get_contents($privateKeyFile));
-    $details = openssl_pkey_get_details($privateKey);
-
-    $protected = array(
-      "alg" => "RS256",
-      "kid" => $kid,
-      "nonce" => $this->nonce,
-      "url" => $url
-    );
-
-    $payload64 = WPLEFunctions::Base64UrlSafeEncode(str_replace('\\/', '/', is_array($payload) ? json_encode($payload) : $payload));
-    $protected64 = WPLEFunctions::Base64UrlSafeEncode(json_encode($protected));
-
-    openssl_sign($protected64 . '.' . $payload64, $signed, $privateKey, "SHA256");
-    $signed64 = WPLEFunctions::Base64UrlSafeEncode($signed);
-
-    $data = array(
-      'protected' => $protected64,
-      'payload' => $payload64,
-      'signature' => $signed64
-    );
-
-    return json_encode($data);
-  }
 }

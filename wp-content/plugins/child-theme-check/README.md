@@ -24,6 +24,26 @@ Thank you very much @WooThemes and @WooCommerce for using the GPL, so that I can
 
 ## Changelog
 
+### 1.0.9
+* Tested with WordPress 6.6
+
+### 1.0.8
+* Upublished because of problems with SVN
+
+### 1.0.7
+* Tested with WordPress 6.5
+
+### 1.0.6
+* Fix CSS
+
+### 1.0.5
+* Fix broken layout in Wordpress 5.7 (Thanks to Torsten Bulk for the report)
+* Fix PHP warning
+* Tested up to 5.7
+
+### 1.0.4
+* not released
+
 ### 1.0.3
 
 * Fix flashing of first diff view

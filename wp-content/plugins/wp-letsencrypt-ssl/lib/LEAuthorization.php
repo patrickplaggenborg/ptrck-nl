@@ -2,6 +2,8 @@
 
 namespace WPLEClient;
 
+use WPLEClient\Exceptions\LEAuthorizationException;
+
 /**
  * LetsEncrypt Authorization class, getting LetsEncrypt authorization data associated with a LetsEncrypt Order instance.
  *
@@ -37,85 +39,76 @@ namespace WPLEClient;
  */
 class LEAuthorization
 {
-	private $connector;
+  private $connector;
 
-	public $authorizationURL;
-	public $identifier;
-	public $status;
-	public $expires;
-	public $challenges;
+  public $authorizationURL;
+  public $identifier;
+  public $status;
+  public $expires;
+  public $challenges;
 
-	private $log;
+  private $log;
 
-    /**
-     * Initiates the LetsEncrypt Authorization class. Child of a LetsEncrypt Order instance.
-     *
-     * @param WPLEConnector	$connector			The LetsEncrypt Connector instance to use for HTTP requests.
-     * @param int 			$log 				The level of logging. Defaults to no logging. LOG_OFF, LOG_STATUS, LOG_DEBUG accepted.
-     * @param string 		$authorizationURL 	The URL of the authorization, given by a LetsEncrypt order request.
-     */
-	public function __construct($connector, $log, $authorizationURL)
-	{
-		$this->connector = $connector;
-		$this->log = $log;
-		$this->authorizationURL = $authorizationURL;
+  /**
+   * Initiates the LetsEncrypt Authorization class. Child of a LetsEncrypt Order instance.
+   *
+   * @param LEConnector	$connector			The LetsEncrypt Connector instance to use for HTTP requests.
+   * @param int 			$log 				The level of logging. Defaults to no logging. LOG_OFF, LOG_STATUS, LOG_DEBUG accepted.
+   * @param string 		$authorizationURL 	The URL of the authorization, given by a LetsEncrypt order request.
+   */
+  public function __construct($connector, $log, $authorizationURL)
+  {
+    $this->connector = $connector;
+    $this->log = $log;
+    $this->authorizationURL = $authorizationURL;
 
-		$get = $this->connector->get($this->authorizationURL);
-		if($get['status'] === 200)
-		{
-			$this->identifier = $get['body']['identifier'];
-			$this->status = $get['body']['status'];
-			$this->expires = $get['body']['expires'];
-			$this->challenges = $get['body']['challenges'];
-		}
-		else
-		{
-			if($this->log instanceof \Psr\Log\LoggerInterface) 
-			{
-				$this->log->info('Cannot find authorization \'' . $authorizationURL . '\'.');
-			}
-			elseif($this->log >= WPLEClient::LOG_STATUS) WPLEFunctions::log('Cannot find authorization \'' . $authorizationURL . '\'.', 'function LEAuthorization __construct');
-		}
-	}
+    $sign = $this->connector->signRequestKid('', $this->connector->accountURL, $this->authorizationURL);
+    $post = $this->connector->post($this->authorizationURL, $sign);
+    if ($post['status'] === 200) {
+      $this->identifier = $post['body']['identifier'];
+      $this->status = $post['body']['status'];
+      $this->expires = $post['body']['expires'];
+      $this->challenges = $post['body']['challenges'];
+    } else {
+      if ($this->log instanceof \Psr\Log\LoggerInterface) {
+        $this->log->info('Cannot find authorization \'' . $authorizationURL . '\'.');
+      } elseif ($this->log >= LEClient::LOG_STATUS) LEFunctions::log('Cannot find authorization \'' . $authorizationURL . '\'.', 'function LEAuthorization __construct');
+    }
+  }
 
-    /**
-     * Updates the data associated with the current LetsEncrypt Authorization instance.
-     */
+  /**
+   * Updates the data associated with the current LetsEncrypt Authorization instance.
+   */
 
-	public function updateData()
-	{
-		$get = $this->connector->get($this->authorizationURL);
-		if($get['status'] === 200)
-		{
-			$this->identifier = $get['body']['identifier'];
-			$this->status = $get['body']['status'];
-			$this->expires = $get['body']['expires'];
-			$this->challenges = $get['body']['challenges'];
-		}
-		else
-		{
-			if($this->log instanceof \Psr\Log\LoggerInterface) 
-			{
-				$this->log->info('Cannot find authorization \'' . $this->authorizationURL . '\'.');
-			}
-			elseif($this->log >= WPLEClient::LOG_STATUS) WPLEFunctions::log('Cannot find authorization \'' . $this->authorizationURL . '\'.', 'function updateData');
-		}
-	}
+  public function updateData()
+  {
+    $sign = $this->connector->signRequestKid('', $this->connector->accountURL, $this->authorizationURL);
+    $post = $this->connector->post($this->authorizationURL, $sign);
+    if ($post['status'] === 200) {
+      $this->identifier = $post['body']['identifier'];
+      $this->status = $post['body']['status'];
+      $this->expires = $post['body']['expires'];
+      $this->challenges = $post['body']['challenges'];
+    } else {
+      if ($this->log instanceof \Psr\Log\LoggerInterface) {
+        $this->log->info('Cannot find authorization \'' . $this->authorizationURL . '\'.');
+      } elseif ($this->log >= LEClient::LOG_STATUS) LEFunctions::log('Cannot find authorization \'' . $this->authorizationURL . '\'.', 'function updateData');
+    }
+  }
 
-    /**
-     * Gets the challenge of the given $type for this LetsEncrypt Authorization instance. Throws a Runtime Exception if the given $type is not found in this
-	 * LetsEncrypt Authorization instance.
-     *
-     * @param int	$type 	The type of verification. Supporting LEOrder::CHALLENGE_TYPE_HTTP and LEOrder::CHALLENGE_TYPE_DNS.
-     *
-     * @return array	Returns an array with the challenge of the requested $type.
-     */
-	public function getChallenge($type)
-	{
-		foreach($this->challenges as $challenge)
-		{
-			if($challenge['type'] == $type) return $challenge;
-		}
-		throw new \RuntimeException('No challenge found for type \'' . $type . '\' and identifier \'' . $this->identifier['value'] . '\'.');
-	}
+  /**
+   * Gets the challenge of the given $type for this LetsEncrypt Authorization instance. Throws a Runtime Exception if the given $type is not found in this
+   * LetsEncrypt Authorization instance.
+   *
+   * @param int	$type 	The type of verification. Supporting LEOrder::CHALLENGE_TYPE_HTTP and LEOrder::CHALLENGE_TYPE_DNS.
+   *
+   * @return array	Returns an array with the challenge of the requested $type.
+   */
+  public function getChallenge($type)
+  {
+    foreach ($this->challenges as $challenge) {
+      if ($challenge['type'] == $type) return $challenge;
+    }
+    throw LEAuthorizationException::NoChallengeFoundException($type, $this->identifier['value']);
+  }
 }

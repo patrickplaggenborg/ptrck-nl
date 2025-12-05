@@ -59,10 +59,11 @@ class CPTP_Module_Rewrite extends CPTP_Module {
 			$permalink = CPTP_DEFAULT_PERMALINK;
 		}
 
-		$permalink = '%' . $post_type . '_slug%' . $permalink;
-		$permalink = str_replace( '%postname%', '%' . $post_type . '%', $permalink );
+		$slug_placeholder = self::get_slug_placeholder( $post_type );
+		$permalink        = $slug_placeholder . $permalink;
+		$permalink        = str_replace( '%postname%', '%' . $post_type . '%', $permalink );
 
-		add_rewrite_tag( '%' . $post_type . '_slug%', '(' . $args->rewrite['slug'] . ')', 'post_type=' . $post_type . '&slug=' );
+		add_rewrite_tag( $slug_placeholder, '(' . $args->rewrite['slug'] . ')', 'post_type=' . $post_type . '&slug=' );
 
 		$taxonomies = CPTP_Util::get_taxonomies( true );
 		foreach ( $taxonomies as $taxonomy => $objects ) :
@@ -80,7 +81,7 @@ class CPTP_Module_Rewrite extends CPTP_Module {
 		if ( $args->has_archive ) {
 			if ( is_string( $args->has_archive ) ) {
 				$slug = $args->has_archive;
-			};
+			}
 
 			if ( $args->rewrite['with_front'] ) {
 				$slug = substr( $wp_rewrite->front, 1 ) . $slug;
@@ -160,7 +161,7 @@ class CPTP_Module_Rewrite extends CPTP_Module {
 
 			if ( ! empty( $post_type_obj->has_archive ) && is_string( $post_type_obj->has_archive ) ) {
 				$slug = $post_type_obj->has_archive;
-			};
+			}
 
 			if ( ! empty( $post_type_obj->rewrite['with_front'] ) ) {
 				$slug = substr( $wp_rewrite->front, 1 ) . $slug;
@@ -279,5 +280,16 @@ class CPTP_Module_Rewrite extends CPTP_Module {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns the slug placeholder user in the permalink structure.
+	 *
+	 * @param string $post_type The post type.
+	 *
+	 * @return string
+	 */
+	public static function get_slug_placeholder( $post_type ) {
+		return '%' . $post_type . '_slug%';
 	}
 }

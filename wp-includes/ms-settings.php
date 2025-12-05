@@ -10,11 +10,18 @@
  * @since 3.0.0
  */
 
+// Don't load directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	die( '-1' );
+}
+
 /**
  * Objects representing the current network and current site.
  *
  * These may be populated through a custom `sunrise.php`. If not, then this
  * file will attempt to populate them based on the current request.
+ *
+ * @since 3.0.0
  *
  * @global WP_Network $current_site The current network.
  * @global object     $current_blog The current site.
@@ -26,25 +33,23 @@
  *                                  Use `get_current_network_id()` instead.
  * @global bool       $public       Deprecated. Whether the site found on load is public.
  *                                  Use `get_site()->public` instead.
- *
- * @since 3.0.0
  */
 global $current_site, $current_blog, $domain, $path, $site_id, $public;
 
 /** WP_Network class */
-require_once( ABSPATH . WPINC . '/class-wp-network.php' );
+require_once ABSPATH . WPINC . '/class-wp-network.php';
 
 /** WP_Site class */
-require_once( ABSPATH . WPINC . '/class-wp-site.php' );
+require_once ABSPATH . WPINC . '/class-wp-site.php';
 
 /** Multisite loader */
-require_once( ABSPATH . WPINC . '/ms-load.php' );
+require_once ABSPATH . WPINC . '/ms-load.php';
 
 /** Default Multisite constants */
-require_once( ABSPATH . WPINC . '/ms-default-constants.php' );
+require_once ABSPATH . WPINC . '/ms-default-constants.php';
 
 if ( defined( 'SUNRISE' ) ) {
-	include_once( WP_CONTENT_DIR . '/sunrise.php' );
+	include_once WP_CONTENT_DIR . '/sunrise.php';
 }
 
 /** Check for and define SUBDOMAIN_INSTALL and the deprecated VHOST constant. */
@@ -54,11 +59,11 @@ ms_subdomain_constants();
 // have not been populated in the global scope through something like `sunrise.php`.
 if ( ! isset( $current_site ) || ! isset( $current_blog ) ) {
 
-	$domain = strtolower( stripslashes( $_SERVER['HTTP_HOST'] ) );
-	if ( substr( $domain, -3 ) == ':80' ) {
+	$domain = strtolower( stripslashes( $_SERVER['HTTP_HOST'] ?? '' ) );
+	if ( str_ends_with( $domain, ':80' ) ) {
 		$domain               = substr( $domain, 0, -3 );
 		$_SERVER['HTTP_HOST'] = substr( $_SERVER['HTTP_HOST'], 0, -3 );
-	} elseif ( substr( $domain, -4 ) == ':443' ) {
+	} elseif ( str_ends_with( $domain, ':443' ) ) {
 		$domain               = substr( $domain, 0, -4 );
 		$_SERVER['HTTP_HOST'] = substr( $_SERVER['HTTP_HOST'], 0, -4 );
 	}
@@ -72,7 +77,7 @@ if ( ! isset( $current_site ) || ! isset( $current_blog ) ) {
 	$bootstrap_result = ms_load_current_site_and_network( $domain, $path, is_subdomain_install() );
 
 	if ( true === $bootstrap_result ) {
-		// `$current_blog` and `$current_site are now populated.
+		// `$current_blog` and `$current_site` are now populated.
 	} elseif ( false === $bootstrap_result ) {
 		ms_not_installed( $domain, $path );
 	} else {
@@ -94,13 +99,13 @@ if ( ! isset( $current_site ) || ! isset( $current_blog ) ) {
 	wp_load_core_site_options( $site_id );
 }
 
-$wpdb->set_prefix( $table_prefix, false ); // $table_prefix can be set in sunrise.php
+$wpdb->set_prefix( $table_prefix, false ); // $table_prefix can be set in sunrise.php.
 $wpdb->set_blog_id( $current_blog->blog_id, $current_blog->site_id );
 $table_prefix       = $wpdb->get_blog_prefix();
 $_wp_switched_stack = array();
 $switched           = false;
 
-// need to init cache again after blog_id is set
+// Need to init cache again after blog_id is set.
 wp_start_object_cache();
 
 if ( ! $current_site instanceof WP_Network ) {
@@ -111,7 +116,7 @@ if ( ! $current_blog instanceof WP_Site ) {
 	$current_blog = new WP_Site( $current_blog );
 }
 
-// Define upload directory constants
+// Define upload directory constants.
 ms_upload_constants();
 
 /**
