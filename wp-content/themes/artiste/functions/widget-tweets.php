@@ -33,13 +33,13 @@ add_action('init', 'tz_twitter_js');
 /*
  * Widget class.
  */
-class tz_tweet_widget extends WP_Widget {
+class TZ_Tweet_Widget extends WP_Widget {
 
 	/* ---------------------------- */
 	/* -------- Widget setup -------- */
 	/* ---------------------------- */
 	
-	function TZ_Tweet_Widget() {
+	function __construct() {
 	
 		/* Widget settings. */
 		$widget_ops = array( 'classname' => 'tz_tweet_widget', 'description' => __('A widget that displays your latest tweets.', 'framework') );
@@ -48,7 +48,7 @@ class tz_tweet_widget extends WP_Widget {
 		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'tz_tweet_widget' );
 
 		/* Create the widget. */
-		$this->WP_Widget( 'tz_tweet_widget', __('Custom Latest Tweets','framework'), $widget_ops, $control_ops );
+		parent::__construct( 'tz_tweet_widget', __('Custom Latest Tweets','framework'), $widget_ops, $control_ops );
 	}
 
 	/* ---------------------------- */

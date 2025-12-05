@@ -30,6 +30,7 @@ if ( ! isset( $content_width ) ) $content_width = 670;
 
 if ( function_exists('register_sidebar') ) {
 	register_sidebar(array(
+		'id' => 'sidebar-1',
 		'name' => 'Main Sidebar',
 		'before_widget' => '<div id="%1$s" class="widget %2$s">',
 		'after_widget' => '</div>',
@@ -37,6 +38,7 @@ if ( function_exists('register_sidebar') ) {
 		'after_title' => '</h3>',
 	));
 	register_sidebar(array(
+		'id' => 'sidebar-2',
 		'name' => 'Portfolio Sidebar',
 		'before_widget' => '<div id="%1$s" class="widget %2$s">',
 		'after_widget' => '</div>',
